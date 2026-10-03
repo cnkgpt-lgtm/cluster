@@ -70,6 +70,7 @@ model User {
   passwordHash String
   role         Role     @default(WARGA)
   phone        String?
+  alamat       String?  // Alamat lengkap, mis. "Jl. Mawar No. 12, Perumahan Griya Asri"
   blok         String?  // Blok perumahan, mis. "A"
   nomorRumah   String?  // Nomor rumah, mis. "12"
   isActive     Boolean  @default(true)

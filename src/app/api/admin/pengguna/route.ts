@@ -15,7 +15,7 @@ export async function GET() {
 
   const items = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    select: { id: true, name: true, email: true, role: true, blok: true, nomorRumah: true, phone: true, isActive: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, blok: true, nomorRumah: true, phone: true, alamat: true, isActive: true, createdAt: true },
   });
   return NextResponse.json({ items });
 }
@@ -28,6 +28,7 @@ const createSchema = z.object({
   blok: z.string().max(10).optional(),
   nomorRumah: z.string().max(10).optional(),
   phone: z.string().max(20).optional(),
+  alamat: z.string().max(300).optional(),
 });
 
 // POST /api/admin/pengguna — tambah pengguna (Pengurus)
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
       blok: parsed.data.blok,
       nomorRumah: parsed.data.nomorRumah,
       phone: parsed.data.phone,
+      alamat: parsed.data.alamat,
     },
     select: { id: true },
   });

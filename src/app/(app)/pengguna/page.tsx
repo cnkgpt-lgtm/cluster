@@ -11,6 +11,7 @@ interface Pengguna {
   blok: string | null;
   nomorRumah: string | null;
   phone: string | null;
+  alamat: string | null;
   isActive: boolean;
 }
 
@@ -22,7 +23,7 @@ export default function PenggunaPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "WARGA", blok: "", nomorRumah: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "WARGA", blok: "", nomorRumah: "", phone: "", alamat: "" });
 
   async function load() {
     setLoading(true);
@@ -49,7 +50,7 @@ export default function PenggunaPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Gagal menambah pengguna");
       setShowForm(false);
-      setForm({ name: "", email: "", password: "", role: "WARGA", blok: "", nomorRumah: "", phone: "" });
+      setForm({ name: "", email: "", password: "", role: "WARGA", blok: "", nomorRumah: "", phone: "", alamat: "" });
       load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan");
@@ -117,6 +118,16 @@ export default function PenggunaPage() {
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">No. Rumah</label>
               <input value={form.nomorRumah} onChange={(e) => set("nomorRumah", e.target.value)} placeholder="12"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">No. WhatsApp</label>
+              <input value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="081234567890"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-slate-700">Alamat Lengkap</label>
+              <input value={form.alamat} onChange={(e) => set("alamat", e.target.value)} placeholder="Jl. Mawar No. 12, Perumahan Griya Asri"
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
             </div>
             <div className="sm:col-span-2">

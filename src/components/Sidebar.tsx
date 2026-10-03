@@ -18,6 +18,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
+    { href: "/profil", label: "Profil Saya", icon: "👤" },
   ],
   PENGURUS: [
     { href: "/dashboard", label: "Dashboard", icon: "🏠" },
@@ -31,6 +32,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/warga", label: "Info Warga", icon: "👥" },
     { href: "/pengguna", label: "Pengguna", icon: "⚙️" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
+    { href: "/profil", label: "Profil Saya", icon: "👤" },
   ],
   BENDAHARA: [
     { href: "/dashboard", label: "Dashboard", icon: "🏠" },
@@ -43,6 +45,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
+    { href: "/profil", label: "Profil Saya", icon: "👤" },
   ],
   SEKRETARIS: [
     { href: "/dashboard", label: "Dashboard", icon: "🏠" },
@@ -51,6 +54,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
+    { href: "/profil", label: "Profil Saya", icon: "👤" },
   ],
 };
 

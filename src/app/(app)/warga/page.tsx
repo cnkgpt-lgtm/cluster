@@ -21,7 +21,7 @@ export default async function WargaPage() {
   const items = await prisma.user.findMany({
     where: { isActive: true },
     orderBy: [{ role: "asc" }, { blok: "asc" }, { nomorRumah: "asc" }, { name: "asc" }],
-    select: { id: true, name: true, role: true, blok: true, nomorRumah: true, phone: true },
+    select: { id: true, name: true, role: true, blok: true, nomorRumah: true, phone: true, alamat: true },
   });
 
   const pengurus = items.filter((u) => u.role !== "WARGA");
@@ -67,8 +67,9 @@ export default async function WargaPage() {
                   <p className="truncate font-semibold text-slate-800">{u.name}</p>
                   <p className="text-xs text-slate-500">
                     {u.blok ? `Blok ${u.blok}` : ""}{u.nomorRumah ? ` No. ${u.nomorRumah}` : ""}
-                    {u.phone ? ` · ${u.phone}` : ""}
+                    {u.phone ? ` · 📱 ${u.phone}` : ""}
                   </p>
+                  {u.alamat && <p className="mt-0.5 truncate text-xs text-slate-400">📍 {u.alamat}</p>}
                 </div>
               </li>
             ))}
