@@ -33,9 +33,10 @@ function extFromMime(mime: string): string {
 }
 
 import { gdriveConfigured, uploadBuktiToDrive } from "./gdrive";
+import { telegramStorageConfigured, uploadBuktiToTelegram } from "./telegram-storage";
 
 // Simpan bukti transfer; kembalikan URL publik.
-// Prioritas: Cloudflare R2 → Google Drive → data URL base64.
+// Prioritas: Cloudflare R2 → Google Drive → Telegram → data URL base64.
 // Data URL adalah fallback terakhir yang selalu bekerja (termasuk di Vercel
 // yang filesystem-nya read-only) bila tidak ada penyimpanan eksternal.
 export async function simpanBukti(file: File): Promise<string> {
@@ -72,6 +73,15 @@ export async function simpanBukti(file: File): Promise<string> {
       return await uploadBuktiToDrive(file);
     } catch (e) {
       console.error("Upload Google Drive gagal, fallback ke data URL:", e);
+    }
+  }
+
+  // Telegram (bot → channel/group pribadi; gratis, tanpa kartu kredit)
+  if (telegramStorageConfigured()) {
+    try {
+      return await uploadBuktiToTelegram(file);
+    } catch (e) {
+      console.error("Upload Telegram gagal, fallback ke data URL:", e);
     }
   }
 

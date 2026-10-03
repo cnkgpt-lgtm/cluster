@@ -4,7 +4,19 @@ import { useEffect, useState } from "react";
 import { Card, Empty } from "@/components/ui";
 import { isDriveLink, driveThumbnailUrl } from "@/lib/gdrive-link";
 
-function BuktiTransfer({ url }: { url: string }) {
+function BuktiTransfer({ url, pembayaranId }: { url: string; pembayaranId: string }) {
+  if (url.startsWith("tg:")) {
+    const proxy = `/api/pembayaran/${pembayaranId}/bukti`;
+    return (
+      <a href={proxy} target="_blank" rel="noreferrer" className="mt-3 block">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={proxy} alt="Bukti transfer" className="max-h-64 rounded-xl border border-slate-200" />
+        <span className="mt-2 inline-block rounded-xl bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-200">
+          📁 Lihat Bukti (tersimpan di Telegram) ↗
+        </span>
+      </a>
+    );
+  }
   if (isDriveLink(url)) {
     const thumb = driveThumbnailUrl(url);
     return (
@@ -102,7 +114,7 @@ export default function ValidasiPage() {
                   <p className="text-lg font-extrabold text-slate-900">Rp{p.nominal.toLocaleString("id-ID")}</p>
                 </div>
 
-                {p.buktiUrl && <BuktiTransfer url={p.buktiUrl} />}
+                {p.buktiUrl && <BuktiTransfer url={p.buktiUrl} pembayaranId={p.id} />}
 
                 <input
                   value={catatan[p.id] ?? ""}
