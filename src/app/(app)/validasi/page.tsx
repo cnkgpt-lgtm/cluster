@@ -1,8 +1,50 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, Empty } from "@/components/ui";
+import { Card, Empty, Badge } from "@/components/ui";
 import { isDriveLink, driveThumbnailUrl } from "@/lib/gdrive-link";
+
+const STORAGE_INFO: Record<string, { label: string; icon: string; ok: boolean }> = {
+  R2: { label: "Cloudflare R2", icon: "☁️", ok: true },
+  GOOGLE_DRIVE: { label: "Google Drive", icon: "📁", ok: true },
+  TELEGRAM: { label: "Telegram", icon: "✈️", ok: true },
+  DATABASE: { label: "Sementara (database)", icon: "💾", ok: false },
+};
+
+function StatusPenyimpanan() {
+  const [aktif, setAktif] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/storage/status")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.aktif && setAktif(d.aktif))
+      .catch(() => {});
+  }, []);
+
+  if (!aktif) return null;
+  const info = STORAGE_INFO[aktif] ?? STORAGE_INFO.DATABASE;
+
+  return (
+    <div
+      className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm ${
+        info.ok
+          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+          : "border-amber-200 bg-amber-50 text-amber-800"
+      }`}
+    >
+      <span className="text-base">{info.icon}</span>
+      <span>
+        Penyimpanan bukti: <b>{info.label}</b>
+        {!info.ok && (
+          <span className="text-amber-700"> — sambungkan Telegram/Google Drive agar tersimpan permanen</span>
+        )}
+      </span>
+      <span className="ml-auto">
+        <Badge tone={info.ok ? "green" : "amber"}>{info.ok ? "Terhubung" : "Sementara"}</Badge>
+      </span>
+    </div>
+  );
+}
 
 function BuktiTransfer({ url, pembayaranId }: { url: string; pembayaranId: string }) {
   if (url.startsWith("tg:")) {
@@ -95,6 +137,8 @@ export default function ValidasiPage() {
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Validasi Pembayaran</h1>
         <p className="text-sm text-slate-500">Periksa bukti transfer manual dari warga, lalu terima atau tolak.</p>
       </div>
+
+      <StatusPenyimpanan />
 
       <Card title={`Menunggu Validasi (${items.length})`}>
         {loading ? (
