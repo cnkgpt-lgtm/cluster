@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const PUBLIK = ["/login", "/api/auth", "/api/webhooks"];
+// Endpoint API-key (punya autentikasi sendiri, tanpa cookie sesi)
+const PUBLIK_API_KEY = ["/api/admin/seed", "/api/admin/status"];
 
 // Middleware ringan (Edge, <1MB): hanya cek keberadaan cookie sesi.
 // Verifikasi kriptografis tetap dilakukan di setiap halaman/API via auth().
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isPublik = PUBLIK.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const isPublik =
+    PUBLIK.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+    PUBLIK_API_KEY.some((p) => pathname === p || pathname.startsWith(p + "/"));
   if (isPublik) return NextResponse.next();
 
   const token =
