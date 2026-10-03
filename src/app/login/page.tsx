@@ -15,11 +15,16 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    // Hanya izinkan callbackUrl berupa path internal (cegah open-redirect
+    // dan nyangkut di halaman yang tidak ada).
+    const rawCb = params.get("callbackUrl");
+    const callbackUrl =
+      rawCb && rawCb.startsWith("/") && !rawCb.startsWith("//") ? rawCb : "/dashboard";
     const res = await signIn("credentials", {
       email,
       password,
       redirect: false,
-      callbackUrl: params.get("callbackUrl") ?? "/dashboard",
+      callbackUrl,
     });
     if (res?.error) {
       setError("Email atau kata sandi salah.");
