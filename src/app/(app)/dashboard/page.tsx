@@ -119,7 +119,7 @@ export default async function DashboardPage() {
         <p className="text-sm text-slate-500">Kelola iuran, kas, dan validasi pembayaran warga.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Kas Masuk Bulan Ini" value={rupiah(kasMasuk._sum.nominal ?? 0)} icon="💰" tone="emerald" />
         <StatCard label="Pengeluaran Bulan Ini" value={rupiah(pengeluaran._sum.nominal ?? 0)} icon="🧾" tone="red" />
         <StatCard label="Menunggu Validasi" value={String(menungguValidasi)} sub="bukti transfer manual" icon="⏳" tone="amber" />

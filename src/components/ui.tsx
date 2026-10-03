@@ -24,7 +24,7 @@ export function StatCard({
         <p className="text-sm font-medium text-slate-500">{label}</p>
         <span className={`rounded-xl px-2.5 py-1.5 text-lg ${tones[tone]}`}>{icon}</span>
       </div>
-      <p className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">{value}</p>
+      <p className="mt-2 break-words text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">{value}</p>
       {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
     </div>
   );

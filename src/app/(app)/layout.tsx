@@ -11,7 +11,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = session.user as { name: string; email: string; role: string };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen bg-slate-50 lg:flex">
       <Sidebar user={user} />
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-20 hidden items-center justify-end border-b border-slate-200 bg-white/85 px-6 py-3 backdrop-blur lg:flex">
