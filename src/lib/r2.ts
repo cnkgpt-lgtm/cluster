@@ -1,7 +1,5 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -35,7 +33,9 @@ function extFromMime(mime: string): string {
 }
 
 // Simpan bukti transfer; kembalikan URL publik.
-// Pakai Cloudflare R2 bila dikonfigurasi, selain itu simpan lokal (dev saja).
+// Pakai Cloudflare R2 bila dikonfigurasi. Jika tidak, simpan sebagai data URL
+// base64 di database — cara ini otomatis bekerja di Vercel (filesystem read-only)
+// maupun di development lokal tanpa perlu folder uploads.
 export async function simpanBukti(file: File): Promise<string> {
   validateFile(file);
   const key = `bukti/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, "0")}/${randomUUID()}.${extFromMime(file.type)}`;
@@ -64,9 +64,6 @@ export async function simpanBukti(file: File): Promise<string> {
     return `r2://${process.env.R2_BUCKET}/${key}`;
   }
 
-  // Fallback lokal (development)
-  const dir = path.join(process.cwd(), "public", "uploads", path.dirname(key));
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(process.cwd(), "public", "uploads", key), bytes);
-  return `/uploads/${key}`;
+  // Fallback: data URL base64 (tanpa R2). Aman di serverless/Vercel.
+  return `data:${file.type};base64,${bytes.toString("base64")}`;
 }
