@@ -57,23 +57,24 @@ Di halaman import (atau **Settings → Environment Variables**), isi:
 
 > ⚠️ Secret yang diawali `NEXT_PUBLIC_` akan terlihat di browser. Jangan pernah menaruh `MIDTRANS_SERVER_KEY`, `DATABASE_URL`, atau `AUTH_SECRET` dengan prefix itu.
 
-## Langkah 4 — Database: migrate & seed
+## Langkah 4 — Database: migrasi otomatis & seed
 
-Setelah env terisi, buka **Vercel → Project → Storage**? Tidak perlu — database eksternal (Neon/Supabase).
+**Migrasi berjalan otomatis** setiap deploy: build command di `package.json` adalah
+`prisma migrate deploy && prisma generate && next build`, jadi tabel database
+terbentuk sendiri saat Vercel membangun aplikasi (selama `DATABASE_URL` terisi).
 
-Jalankan migrasi sekali dari komputer Anda (pastikan `.env` lokal berisi `DATABASE_URL` yang sama):
+**Seed data demo** (akun demo + tagihan contoh) dijalankan sekali via endpoint khusus:
 
 ```bash
-npx prisma migrate deploy
-npx prisma db seed
+curl -X POST https://DOMAIN_ANDA/api/admin/seed \
+  -H "x-api-key: ISI_NEXTAUTH_API_KEY_ANDA"
 ```
 
-Atau tambahkan ke **Build Command** Vercel (opsional, untuk auto-migrate tiap deploy):
-```
-prisma migrate deploy && prisma generate && next build
-```
+Endpoint ini idempoten (aman dipanggil ulang) dan hanya bisa diakses dengan API key server.
+Setelah seed berhasil, segera nonaktifkan/ganti kata sandi akun demo.
 
-> Catatan: perintah `build` di `package.json` sudah menjalankan `prisma generate` otomatis.
+> Alternatif manual dari komputer: `npx prisma migrate deploy && npm run db:seed`
+> (butuh `.env` lokal berisi `DATABASE_URL` yang sama).
 
 ## Langkah 5 — Deploy & verifikasi
 
