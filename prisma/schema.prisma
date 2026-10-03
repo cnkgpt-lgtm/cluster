@@ -1,0 +1,215 @@
+// RTKu — Aplikasi RT/R Perumahan
+// Database authority: Prisma + PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---- Enum -----------------------------------------------------------------
+
+enum Role {
+  WARGA
+  PENGURUS
+  BENDAHARA
+  SEKRETARIS
+}
+
+enum JenisTagihan {
+  IURAN_BULANAN
+  IURAN_KEAMANAN
+  IURAN_KEBERSIHAN
+  IURAN_SOSIAL
+  LAINNYA
+}
+
+// Status tagihan per warga
+enum StatusTagihanWarga {
+  BELUM_BAYAR
+  MENUNGGU_VALIDASI
+  LUNAS
+  KEDALUWARSA
+}
+
+// State machine pembayaran (lihat lib/pembayaran.ts untuk transisi yang sah)
+enum StatusPembayaran {
+  PENDING
+  MENUNGGU_VALIDASI
+  PAID
+  FAILED
+  EXPIRED
+  DITOLAK
+}
+
+enum MetodePembayaran {
+  QRIS
+  VA_BCA
+  VA_BNI
+  VA_BRI
+  VA_MANDIRI
+  VA_PERMATA
+  TRANSFER_MANUAL
+}
+
+enum StatusKamera {
+  AKTIF
+  NONAKTIF
+}
+
+// ---- Model ----------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(WARGA)
+  phone        String?
+  blok         String?  // Blok perumahan, mis. "A"
+  nomorRumah   String?  // Nomor rumah, mis. "12"
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tagihanWarga     TagihanWarga[]
+  pembayaran       Pembayaran[]
+  pengumumanDibuat Pengumuman[]     @relation("PengumumanDibuatOleh")
+  tagihanDibuat    Tagihan[]        @relation("TagihanDibuatOleh")
+  pembayaranDivalidasi Pembayaran[] @relation("PembayaranDivalidasiOleh")
+  notifikasi       Notifikasi[]
+  pengeluaranKas   PengeluaranKas[] @relation("KasDicatatOleh")
+
+  @@map("users")
+}
+
+// Tagihan induk (mis. "Iuran Juli 2026") — diterbitkan ke seluruh/ sebagian warga
+model Tagihan {
+  id          String       @id @default(cuid())
+  judul       String
+  periode     String       // "2026-10"
+  jenis       JenisTagihan @default(IURAN_BULANAN)
+  nominal     Int          // dalam rupiah, dihitung & disimpan di server
+  jatuhTempo  DateTime
+  keterangan  String?
+  dibuatOlehId String
+  dibuatOleh  User         @relation("TagihanDibuatOleh", fields: [dibuatOlehId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  items TagihanWarga[]
+
+  @@map("tagihan")
+}
+
+// Tagihan per warga (1 baris per warga per tagihan induk)
+model TagihanWarga {
+  id        String             @id @default(cuid())
+  tagihanId String
+  tagihan   Tagihan            @relation(fields: [tagihanId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nominal   Int
+  status    StatusTagihanWarga @default(BELUM_BAYAR)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  pembayaran Pembayaran[]
+
+  @@unique([tagihanId, userId])
+  @@map("tagihan_warga")
+}
+
+model Pembayaran {
+  id              String            @id @default(cuid())
+  tagihanWargaId  String
+  tagihanWarga    TagihanWarga      @relation(fields: [tagihanWargaId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  metode          MetodePembayaran
+  nominal         Int               // disalin dari tagihan di server, bukan dari client
+  status          StatusPembayaran  @default(PENDING)
+  midtransOrderId String?           @unique
+  snapToken       String?
+  buktiUrl        String?           // bukti transfer manual (R2 / lokal)
+  catatan         String?
+  validatedById   String?
+  validatedBy     User?             @relation("PembayaranDivalidasiOleh", fields: [validatedById], references: [id])
+  validatedAt     DateTime?
+  paidAt          DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@map("pembayaran")
+}
+
+// Dedup/idempotensi event webhook Midtrans (transaction_id unik)
+model MidtransEvent {
+  id                String   @id @default(cuid())
+  orderId           String
+  transactionId     String   @unique
+  transactionStatus String
+  rawPayload        Json
+  createdAt         DateTime @default(now())
+
+  @@map("midtrans_events")
+}
+
+model Pengumuman {
+  id           String   @id @default(cuid())
+  judul        String
+  isi          String   @db.Text
+  kategori     String   @default("UMUM")
+  isPublished  Boolean  @default(true)
+  dibuatOlehId String
+  dibuatOleh   User     @relation("PengumumanDibuatOleh", fields: [dibuatOlehId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("pengumuman")
+}
+
+model KameraCctv {
+  id        String       @id @default(cuid())
+  nama      String
+  lokasi    String?
+  streamUrl String       // URL HLS (.m3u8)
+  status    StatusKamera @default(AKTIF)
+  urutan    Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@map("kamera_cctv")
+}
+
+model Notifikasi {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  judul     String
+  pesan     String
+  tipe      String   @default("INFO") // INFO | PEMBAYARAN | VALIDASI | PENGUMUMAN | TAGIHAN
+  linkUrl   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifikasi")
+}
+
+model PengeluaranKas {
+  id           String   @id @default(cuid())
+  judul        String
+  kategori     String   @default("OPERASIONAL")
+  nominal      Int
+  tanggal      DateTime @default(now())
+  keterangan   String?
+  buktiUrl     String?
+  dicatatOlehId String
+  dicatatOleh  User     @relation("KasDicatatOleh", fields: [dicatatOlehId], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@map("pengeluaran_kas")
+}
