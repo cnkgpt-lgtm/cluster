@@ -71,7 +71,7 @@ export function badgeStatusBayar(status: string) {
     case "PAID":
       return <Badge tone="green">Lunas</Badge>;
     case "MENUNGGU_VALIDASI":
-      return <Badge tone="amber">Menunggu Validasi</Badge>;
+      return <Badge tone="amber">Sedang Diverifikasi</Badge>;
     case "KEDALUWARSA":
     case "EXPIRED":
       return <Badge tone="red">Kedaluwarsa</Badge>;

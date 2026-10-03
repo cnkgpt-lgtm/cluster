@@ -51,6 +51,13 @@ export default async function BayarPage({ params }: { params: Promise<{ id: stri
         <Card title="Pembayaran">
           <BayarForm tagihanWargaId={tw.id} nominal={tw.nominal} />
         </Card>
+      ) : tw.status === "MENUNGGU_VALIDASI" ? (
+        <Card title="Status Pembayaran">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            ⏳ Pembayaran Anda <b>sedang diverifikasi oleh bendahara</b>. Tagihan ini akan
+            berstatus <b>Lunas</b> setelah divalidasi. Tidak perlu membayar ulang.
+          </div>
+        </Card>
       ) : (
         <Card title="Status">
           <p className="text-sm text-slate-600">
