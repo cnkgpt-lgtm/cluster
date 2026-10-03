@@ -2,6 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { Card, Empty } from "@/components/ui";
+import { isDriveLink, driveThumbnailUrl } from "@/lib/gdrive-link";
+
+function BuktiTransfer({ url }: { url: string }) {
+  if (isDriveLink(url)) {
+    const thumb = driveThumbnailUrl(url);
+    return (
+      <a href={url} target="_blank" rel="noreferrer" className="mt-3 block">
+        {thumb && !url.includes(".pdf") ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={thumb} alt="Bukti transfer" className="max-h-64 rounded-xl border border-slate-200" />
+        ) : null}
+        <span className="mt-2 inline-block rounded-xl bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-200">
+          📁 Lihat Bukti di Google Drive ↗
+        </span>
+      </a>
+    );
+  }
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="mt-3 block">
+      {url.endsWith(".pdf") ? (
+        <span className="inline-block rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+          📄 Lihat Bukti (PDF)
+        </span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt="Bukti transfer" className="max-h-64 rounded-xl border border-slate-200" />
+      )}
+    </a>
+  );
+}
 
 interface Item {
   id: string;
@@ -72,18 +102,7 @@ export default function ValidasiPage() {
                   <p className="text-lg font-extrabold text-slate-900">Rp{p.nominal.toLocaleString("id-ID")}</p>
                 </div>
 
-                {p.buktiUrl && (
-                  <a href={p.buktiUrl} target="_blank" rel="noreferrer" className="mt-3 block">
-                    {p.buktiUrl.endsWith(".pdf") ? (
-                      <span className="inline-block rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
-                        📄 Lihat Bukti (PDF)
-                      </span>
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.buktiUrl} alt="Bukti transfer" className="max-h-64 rounded-xl border border-slate-200" />
-                    )}
-                  </a>
-                )}
+                {p.buktiUrl && <BuktiTransfer url={p.buktiUrl} />}
 
                 <input
                   value={catatan[p.id] ?? ""}

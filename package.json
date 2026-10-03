@@ -3,6 +3,7 @@
     "@aws-sdk/client-s3": "^3.879.0",
     "@prisma/client": "^6.5.0",
     "bcryptjs": "^3.0.2",
+    "googleapis": "^183.0.0",
     "hls.js": "^1.6.2",
     "next": "^15.3.4",
     "next-auth": "^5.0.0-beta.29",
@@ -10,7 +11,7 @@
     "react-dom": "^19.1.0",
     "zod": "^3.25.0"
   },
-  "description": "RTKu \u2014 Aplikasi RT/R Perumahan: iuran, pengumuman, CCTV, dan kas warga.",
+  "description": "RTKu — Aplikasi RT/R Perumahan: iuran, pengumuman, CCTV, dan kas warga.",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",
     "@types/bcryptjs": "^3.0.0",

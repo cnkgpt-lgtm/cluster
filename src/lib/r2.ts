@@ -32,10 +32,12 @@ function extFromMime(mime: string): string {
   return "jpg";
 }
 
+import { gdriveConfigured, uploadBuktiToDrive } from "./gdrive";
+
 // Simpan bukti transfer; kembalikan URL publik.
-// Pakai Cloudflare R2 bila dikonfigurasi. Jika tidak, simpan sebagai data URL
-// base64 di database — cara ini otomatis bekerja di Vercel (filesystem read-only)
-// maupun di development lokal tanpa perlu folder uploads.
+// Prioritas: Cloudflare R2 → Google Drive → data URL base64.
+// Data URL adalah fallback terakhir yang selalu bekerja (termasuk di Vercel
+// yang filesystem-nya read-only) bila tidak ada penyimpanan eksternal.
 export async function simpanBukti(file: File): Promise<string> {
   validateFile(file);
   const key = `bukti/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, "0")}/${randomUUID()}.${extFromMime(file.type)}`;
@@ -64,6 +66,15 @@ export async function simpanBukti(file: File): Promise<string> {
     return `r2://${process.env.R2_BUCKET}/${key}`;
   }
 
-  // Fallback: data URL base64 (tanpa R2). Aman di serverless/Vercel.
+  // Google Drive (service account)
+  if (gdriveConfigured()) {
+    try {
+      return await uploadBuktiToDrive(file);
+    } catch (e) {
+      console.error("Upload Google Drive gagal, fallback ke data URL:", e);
+    }
+  }
+
+  // Fallback: data URL base64 (tanpa penyimpanan eksternal). Aman di serverless/Vercel.
   return `data:${file.type};base64,${bytes.toString("base64")}`;
 }
