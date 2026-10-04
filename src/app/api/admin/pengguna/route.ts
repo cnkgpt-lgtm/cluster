@@ -57,5 +57,13 @@ export async function POST(req: NextRequest) {
     },
     select: { id: true },
   });
+
+  // Warga baru langsung mendapat semua tagihan aktif (belum jatuh tempo)
+  // agar tagihannya segera muncul di halaman Iuran.
+  if (parsed.data.role === "WARGA") {
+    const { berikanTagihanAktifKeUserBaru } = await import("@/lib/tagihan");
+    await berikanTagihanAktifKeUserBaru(user.id);
+  }
+
   return NextResponse.json({ ok: true, id: user.id });
 }
