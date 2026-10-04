@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, Empty } from "@/components/ui";
-import { rupiah, formatTanggalWita, labelMetode, labelBulan } from "@/lib/format";
+import { rupiah, formatTanggalWita, labelMetode, NAMA_BULAN } from "@/lib/format";
 
 interface ItemKartu {
   tagihanWargaId: string;
@@ -43,6 +43,7 @@ function keterangan(it: ItemKartu): string {
 export default function KartuSayaPage() {
   const [data, setData] = useState<DataKartu | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tahun, setTahun] = useState(new Date().getFullYear());
 
   useEffect(() => {
     fetch("/api/profil")
@@ -56,6 +57,16 @@ export default function KartuSayaPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  // 12 baris bulan tetap; tiap bulan diisi 1 tagihan yang periodenya cocok (bila ada).
+  const baris = useMemo(() => {
+    if (!data) return [];
+    return NAMA_BULAN.map((nama, i) => {
+      const periode = `${tahun}-${String(i + 1).padStart(2, "0")}`;
+      const it = data.items.find((x) => x.periode === periode) ?? null;
+      return { nama, it };
+    });
+  }, [data, tahun]);
 
   if (loading) {
     return (
@@ -75,7 +86,7 @@ export default function KartuSayaPage() {
     );
   }
 
-  const tahun = new Date().getFullYear();
+  const tahunBerjalan = new Date().getFullYear();
 
   return (
     <div className="anim-fade-up mx-auto max-w-3xl space-y-4">
@@ -105,7 +116,24 @@ export default function KartuSayaPage() {
         <div className="bg-gradient-to-r from-sky-600 via-blue-700 to-sky-600 px-5 py-5 text-center text-white">
           <p className="text-2xl font-extrabold tracking-wide">KARTU TANDA PEMBAYARAN</p>
           <p className="mt-1 text-sm font-semibold text-amber-300">KARTU KONTROL IURAN WARGA</p>
-          <span className="mt-2 inline-block rounded-full bg-white/20 px-4 py-0.5 text-sm font-bold">
+          <div className="no-print mt-2 inline-flex items-center gap-2 rounded-full bg-white/20 px-2 py-0.5">
+            <button
+              onClick={() => setTahun((t) => t - 1)}
+              className="rounded-full px-2 py-0.5 text-sm font-bold hover:bg-white/20"
+              aria-label="Tahun sebelumnya"
+            >
+              ◀
+            </button>
+            <span className="px-1 text-sm font-bold">TAHUN {tahun}</span>
+            <button
+              onClick={() => setTahun((t) => Math.min(t + 1, tahunBerjalan + 1))}
+              className="rounded-full px-2 py-0.5 text-sm font-bold hover:bg-white/20"
+              aria-label="Tahun berikutnya"
+            >
+              ▶
+            </button>
+          </div>
+          <span className="print-only mt-2 hidden rounded-full bg-white/20 px-4 py-0.5 text-sm font-bold print:inline">
             TAHUN {tahun}
           </span>
         </div>
@@ -140,29 +168,27 @@ export default function KartuSayaPage() {
               </tr>
             </thead>
             <tbody>
-              {data.items.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="border border-slate-200 px-2 py-6 text-center text-slate-400">
-                    Belum ada tagihan.
-                  </td>
-                </tr>
-              )}
-              {data.items.map((it, i) => (
-                <tr key={it.tagihanWargaId} className={i % 2 ? "bg-sky-50/50" : ""}>
-                  <td className="border border-slate-200 px-2 py-2 text-center">{i + 1}</td>
-                  <td className="border border-slate-200 px-2 py-2 font-semibold text-blue-900">
-                    {labelBulan(it.periode)}
-                  </td>
-                  <td className="border border-slate-200 px-2 py-2 text-right">{it.nominal.toLocaleString("id-ID")}</td>
-                  <td className="border border-slate-200 px-2 py-2 text-center text-xs">
-                    {it.pembayaran?.penerima ?? "—"}
-                  </td>
-                  <td className="border border-slate-200 px-2 py-2 text-center text-xs">
-                    {it.pembayaran ? formatTanggalWita(it.pembayaran.tanggalBayar) : "—"}
-                  </td>
-                  <td className="border border-slate-200 px-2 py-2 text-xs">{keterangan(it)}</td>
-                </tr>
-              ))}
+              {baris.map((b, i) => {
+                const it = b.it;
+                return (
+                  <tr key={b.nama} className={i % 2 ? "bg-sky-50/50" : ""}>
+                    <td className="border border-slate-200 px-2 py-2 text-center">{i + 1}</td>
+                    <td className="border border-slate-200 px-2 py-2 font-semibold text-blue-900">{b.nama}</td>
+                    <td className="border border-slate-200 px-2 py-2 text-right">
+                      {it ? it.nominal.toLocaleString("id-ID") : "—"}
+                    </td>
+                    <td className="border border-slate-200 px-2 py-2 text-center text-xs">
+                      {it?.pembayaran?.penerima ?? "—"}
+                    </td>
+                    <td className="border border-slate-200 px-2 py-2 text-center text-xs">
+                      {it?.pembayaran ? formatTanggalWita(it.pembayaran.tanggalBayar) : "—"}
+                    </td>
+                    <td className="border border-slate-200 px-2 py-2 text-xs">
+                      {it ? keterangan(it) : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

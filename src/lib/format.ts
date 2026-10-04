@@ -72,6 +72,7 @@ const NAMA_BULAN = [
   "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI",
   "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER",
 ];
+export { NAMA_BULAN };
 
 // "2026-10" -> "OKTOBER 2026" (untuk kolom bulan kartu kontrol)
 export function labelBulan(periode: string): string {
