@@ -12,12 +12,13 @@ const METODE_ONLINE = ["QRIS", "VA_BCA", "VA_BNI", "VA_BRI", "VA_MANDIRI", "VA_P
 
 const jsonSchema = z.object({
   tagihanWargaId: z.string().min(1),
-  metode: z.enum(METODE_ONLINE),
+  // JSON hanya untuk QRIS (otomatis). VA & transfer manual lewat FormData + bukti.
+  metode: z.literal("QRIS"),
 });
 
 // POST /api/pembayaran
-// - JSON {tagihanWargaId, metode: QRIS|VA_*} -> buat transaksi Midtrans (Snap)
-// - FormData {tagihanWargaId, metode: TRANSFER_MANUAL, bukti: File} -> bukti manual
+// - JSON {tagihanWargaId, metode: QRIS} -> buat transaksi Midtrans (Snap)
+// - FormData {tagihanWargaId, metode: TRANSFER_MANUAL|VA_*, bukti: File} -> bukti + validasi bendahara
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
@@ -60,8 +61,8 @@ export async function POST(req: NextRequest) {
   // Nominal selalu dari server
   const nominal = tw.nominal;
 
-  // ---- Transfer manual: wajib bukti ----
-  if (metode === "TRANSFER_MANUAL") {
+  // ---- Transfer manual & VA: wajib bukti, menunggu validasi bendahara ----
+  if (metode === "TRANSFER_MANUAL" || metode.startsWith("VA_")) {
     if (!buktiFile) {
       return NextResponse.json({ error: "VALIDATION_ERROR", detail: "bukti transfer wajib diunggah" }, { status: 400 });
     }
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
       data: {
         tagihanWargaId: tw.id,
         userId: user.id,
-        metode: "TRANSFER_MANUAL",
+        metode: metode as "TRANSFER_MANUAL" | "VA_BCA" | "VA_BNI" | "VA_BRI" | "VA_MANDIRI" | "VA_PERMATA",
         nominal,
         status: "MENUNGGU_VALIDASI",
         buktiUrl,
@@ -97,7 +98,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, pembayaran: { id: pembayaran.id, status: pembayaran.status } });
   }
 
-  // ---- Online (QRIS/VA): pakai ulang transaksi PENDING yang masih hidup ----
+  // ---- Online (QRIS): pakai ulang transaksi PENDING yang masih hidup ----
+  // Catatan: VA kini lewat alur bukti di atas, sehingga di sini hanya QRIS.
   const existing = await prisma.pembayaran.findFirst({
     where: { tagihanWargaId: tw.id, status: "PENDING", midtransOrderId: { not: null } },
     orderBy: { createdAt: "desc" },

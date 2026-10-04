@@ -30,6 +30,12 @@ export function assertTransition(from: StatusPembayaran, to: StatusPembayaran): 
   }
 }
 
+// Aturan bisnis: hanya QRIS yang otomatis lunas (dikonfirmasi gateway).
+// VA bank & transfer manual WAJIB divalidasi bendahara dulu (pakai bukti upload).
+export function perluValidasiBendahara(metode: string): boolean {
+  return metode !== "QRIS";
+}
+
 // Status tagihan warga mengikuti pembayaran
 export function statusTagihanDariPembayaran(
   statusBayar: StatusPembayaran,

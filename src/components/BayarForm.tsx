@@ -21,13 +21,18 @@ declare global {
 
 const METODE = [
   { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun — otomatis lunas", icon: "📱" },
-  { id: "VA_BCA", label: "VA BCA", desc: "Virtual Account Bank BCA — validasi bendahara", icon: "🏦" },
-  { id: "VA_BRI", label: "VA BRI", desc: "Virtual Account Bank BRI — validasi bendahara", icon: "🏦" },
-  { id: "VA_BNI", label: "VA BNI", desc: "Virtual Account Bank BNI — validasi bendahara", icon: "🏦" },
-  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Virtual Account Bank Mandiri — validasi bendahara", icon: "🏦" },
-  { id: "VA_PERMATA", label: "VA Permata", desc: "Virtual Account Bank Permata — validasi bendahara", icon: "🏦" },
+  { id: "VA_BCA", label: "VA BCA", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
+  { id: "VA_BRI", label: "VA BRI", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
+  { id: "VA_BNI", label: "VA BNI", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
+  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
+  { id: "VA_PERMATA", label: "VA Permata", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
   { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti — validasi bendahara", icon: "🧾" },
 ];
+
+// Metode yang memakai upload bukti (bukan otomatis): VA & transfer manual.
+function perluBukti(metode: string): boolean {
+  return metode === "TRANSFER_MANUAL" || metode.startsWith("VA_");
+}
 
 function loadSnap(scriptUrl: string, clientKey: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -84,7 +89,7 @@ export default function BayarForm({
     }
   }
 
-  async function bayarManual() {
+  async function bayarDenganBukti() {
     const file = fileRef.current?.files?.[0];
     if (!file) {
       setError("Pilih file bukti transfer dulu (JPG/PNG/WEBP/PDF, maks 5 MB).");
@@ -95,7 +100,7 @@ export default function BayarForm({
     try {
       const form = new FormData();
       form.append("tagihanWargaId", tagihanWargaId);
-      form.append("metode", "TRANSFER_MANUAL");
+      form.append("metode", metode);
       form.append("bukti", file);
       const res = await fetch("/api/pembayaran", { method: "POST", body: form });
       const data = await res.json();
@@ -137,11 +142,14 @@ export default function BayarForm({
         ))}
       </div>
 
-      {metode === "TRANSFER_MANUAL" && (
+      {perluBukti(metode) && (
         <div className="anim-fade-in rounded-2xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-800">Transfer manual</p>
+          <p className="text-sm font-semibold text-amber-800">
+            {metode === "TRANSFER_MANUAL" ? "Transfer manual" : `Upload bukti ${metode.replace(/_/g, " ")}`}
+          </p>
           <p className="mt-1 text-sm text-amber-700">
-            Transfer sebesar <b>Rp{nominal.toLocaleString("id-ID")}</b> ke rekening bendahara RT,
+            Transfer sebesar <b>Rp{nominal.toLocaleString("id-ID")}</b>
+            {metode === "TRANSFER_MANUAL" ? " ke rekening bendahara RT" : ""},
             lalu unggah bukti transfer di bawah. Pembayaran aktif setelah divalidasi bendahara.
           </p>
           <label className="mt-3 flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border-2 border-dashed border-amber-300 bg-white px-4 py-6 text-center transition hover:border-amber-400 hover:bg-amber-50">
@@ -162,13 +170,13 @@ export default function BayarForm({
       )}
 
       <button
-        onClick={metode === "TRANSFER_MANUAL" ? bayarManual : bayarOnline}
+        onClick={perluBukti(metode) ? bayarDenganBukti : bayarOnline}
         disabled={loading}
         className="w-full rounded-2xl bg-emerald-600 px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-60"
       >
         {loading
           ? "Memproses..."
-          : metode === "TRANSFER_MANUAL"
+          : perluBukti(metode)
             ? "Unggah Bukti & Kirim"
             : `Bayar Rp${nominal.toLocaleString("id-ID")}`}
       </button>

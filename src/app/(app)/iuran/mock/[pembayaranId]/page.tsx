@@ -1,30 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui";
 
-// Halaman simulasi pembayaran — hanya dipakai saat MOCK_PAYMENT=true
+// Halaman simulasi pembayaran QRIS — hanya dipakai saat MOCK_PAYMENT=true.
+// VA & transfer manual memakai upload bukti + validasi bendahara (tanpa simulasi).
 export default function MockBayarPage() {
   const params = useParams<{ pembayaranId: string }>();
   const pembayaranId = params.pembayaranId;
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [metode, setMetode] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/pembayaran?mine=1")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        const p = (d?.items ?? []).find((x: { id: string }) => x.id === pembayaranId);
-        if (p?.metode) setMetode(p.metode);
-      })
-      .catch(() => {});
-  }, [pembayaranId]);
-
-  // Hanya QRIS yang otomatis lunas; VA wajib divalidasi bendahara.
-  const perluValidasi = metode !== null && metode !== "QRIS";
 
   async function simulasi(hasil: "PAID" | "FAILED" | "EXPIRED") {
     setLoading(hasil);
@@ -46,18 +34,14 @@ export default function MockBayarPage() {
 
   return (
     <div className="anim-fade-up mx-auto max-w-md space-y-6">
-      <Card title="Simulasi Pembayaran (Mode Mock)">
+      <Card title="Simulasi Pembayaran QRIS (Mode Mock)">
         <div className="flex flex-col items-center py-4">
           <div className="grid h-40 w-40 place-items-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-5xl">
             📱
           </div>
           <p className="mt-3 text-center text-sm text-slate-500">
-            Mode mock aktif — tidak ada kunci Midtrans. Pilih hasil simulasi pembayaran:
-            {perluValidasi && (
-              <span className="mt-1 block font-semibold text-amber-700">
-                Pembayaran {metode?.replace(/_/g, " ")} wajib divalidasi bendahara sebelum lunas.
-              </span>
-            )}
+            Mode mock aktif — tidak ada kunci Midtrans. QRIS otomatis lunas
+            (tidak perlu validasi bendahara). Pilih hasil simulasi:
           </p>
         </div>
         {error && (
@@ -69,7 +53,7 @@ export default function MockBayarPage() {
             disabled={!!loading}
             className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
           >
-            {loading === "PAID" ? "Memproses..." : perluValidasi ? "✅ Simulasikan Sudah Bayar (→ validasi bendahara)" : "✅ Simulasikan Berhasil (Lunas)"}
+            {loading === "PAID" ? "Memproses..." : "✅ Simulasikan Berhasil (Lunas)"}
           </button>
           <button
             onClick={() => simulasi("FAILED")}
@@ -86,6 +70,12 @@ export default function MockBayarPage() {
             ⌛ Simulasikan Kedaluwarsa
           </button>
         </div>
+        <Link
+          href="/iuran"
+          className="mt-4 block text-center text-sm font-semibold text-slate-500 hover:text-slate-700"
+        >
+          ← Kembali ke Iuran
+        </Link>
       </Card>
     </div>
   );

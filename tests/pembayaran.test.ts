@@ -3,6 +3,7 @@ import {
   canTransition,
   assertTransition,
   statusTagihanDariPembayaran,
+  perluValidasiBendahara,
 } from "@/lib/pembayaran";
 
 describe("state machine pembayaran", () => {
@@ -39,5 +40,15 @@ describe("state machine pembayaran", () => {
     expect(statusTagihanDariPembayaran("EXPIRED")).toBe("KEDALUWARSA");
     expect(statusTagihanDariPembayaran("PENDING")).toBe("BELUM_BAYAR");
     expect(statusTagihanDariPembayaran("DITOLAK")).toBe("BELUM_BAYAR");
+  });
+
+  it("hanya QRIS yang otomatis lunas; VA & transfer manual wajib validasi", () => {
+    expect(perluValidasiBendahara("QRIS")).toBe(false);
+    expect(perluValidasiBendahara("VA_BCA")).toBe(true);
+    expect(perluValidasiBendahara("VA_BRI")).toBe(true);
+    expect(perluValidasiBendahara("VA_BNI")).toBe(true);
+    expect(perluValidasiBendahara("VA_MANDIRI")).toBe(true);
+    expect(perluValidasiBendahara("VA_PERMATA")).toBe(true);
+    expect(perluValidasiBendahara("TRANSFER_MANUAL")).toBe(true);
   });
 });

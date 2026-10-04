@@ -1,13 +1,12 @@
 import { prisma } from "./db";
-import { assertTransition, statusTagihanDariPembayaran, type StatusPembayaran } from "./pembayaran";
+import {
+  assertTransition,
+  statusTagihanDariPembayaran,
+  perluValidasiBendahara,
+  type StatusPembayaran,
+} from "./pembayaran";
 import { kirimNotifikasi, kirimNotifikasiKeRole } from "./notifikasi";
 import { rupiah, labelMetode } from "./format";
-
-// Aturan bisnis: hanya QRIS yang otomatis lunas (dikonfirmasi gateway).
-// VA bank & transfer manual WAJIB divalidasi bendahara dulu.
-export function perluValidasiBendahara(metode: string): boolean {
-  return metode !== "QRIS";
-}
 
 // Terapkan hasil pembayaran ke database + efek samping (notifikasi).
 // Dipakai oleh webhook Midtrans dan simulator mode mock.

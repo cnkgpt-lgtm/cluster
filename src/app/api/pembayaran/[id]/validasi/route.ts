@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import { prosesHasilPembayaran, perluValidasiBendahara } from "@/lib/pembayaran-service";
+import { prosesHasilPembayaran } from "@/lib/pembayaran-service";
+import { perluValidasiBendahara } from "@/lib/pembayaran";
 
 export const dynamic = "force-dynamic";
 
