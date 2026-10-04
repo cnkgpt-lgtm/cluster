@@ -57,3 +57,5 @@ sementara di database.
   lalu redeploy — aplikasi otomatis kembali ke penyimpanan sementara.
 - Jangan pernah membagikan `TELEGRAM_BOT_TOKEN` di chat atau ke orang lain.
   Jika token bocor, cabut lewat @BotFather → `/revoke`.
+
+<!-- trigger: redeploy production agar env var Telegram aktif -->
