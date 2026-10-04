@@ -20,13 +20,13 @@ declare global {
 }
 
 const METODE = [
-  { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun", icon: "📱" },
-  { id: "VA_BCA", label: "VA BCA", desc: "Virtual Account Bank BCA", icon: "🏦" },
-  { id: "VA_BRI", label: "VA BRI", desc: "Virtual Account Bank BRI", icon: "🏦" },
-  { id: "VA_BNI", label: "VA BNI", desc: "Virtual Account Bank BNI", icon: "🏦" },
-  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Virtual Account Bank Mandiri", icon: "🏦" },
-  { id: "VA_PERMATA", label: "VA Permata", desc: "Virtual Account Bank Permata", icon: "🏦" },
-  { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti", icon: "🧾" },
+  { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun — otomatis lunas", icon: "📱" },
+  { id: "VA_BCA", label: "VA BCA", desc: "Virtual Account Bank BCA — validasi bendahara", icon: "🏦" },
+  { id: "VA_BRI", label: "VA BRI", desc: "Virtual Account Bank BRI — validasi bendahara", icon: "🏦" },
+  { id: "VA_BNI", label: "VA BNI", desc: "Virtual Account Bank BNI — validasi bendahara", icon: "🏦" },
+  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Virtual Account Bank Mandiri — validasi bendahara", icon: "🏦" },
+  { id: "VA_PERMATA", label: "VA Permata", desc: "Virtual Account Bank Permata — validasi bendahara", icon: "🏦" },
+  { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti — validasi bendahara", icon: "🧾" },
 ];
 
 function loadSnap(scriptUrl: string, clientKey: string): Promise<void> {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import { prosesHasilPembayaran } from "@/lib/pembayaran-service";
+import { prosesHasilPembayaran, perluValidasiBendahara } from "@/lib/pembayaran-service";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +27,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const pembayaran = await prisma.pembayaran.findUnique({ where: { id } });
   if (!pembayaran) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
-  if (pembayaran.metode !== "TRANSFER_MANUAL" || pembayaran.status !== "MENUNGGU_VALIDASI") {
+  // Hanya metode yang wajib divalidasi (VA/transfer manual) dan masih menunggu.
+  if (!perluValidasiBendahara(pembayaran.metode) || pembayaran.status !== "MENUNGGU_VALIDASI") {
     return NextResponse.json({ error: "INVALID_STATE" }, { status: 400 });
   }
 
@@ -40,7 +41,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       catatan: parsed.data.catatan,
     },
   });
-  await prosesHasilPembayaran(id, statusBaru);
+  await prosesHasilPembayaran(id, statusBaru, { viaValidasiBendahara: true });
 
   return NextResponse.json({ ok: true, status: statusBaru });
 }

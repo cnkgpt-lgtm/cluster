@@ -90,6 +90,7 @@ function BuktiTransfer({ url, pembayaranId }: { url: string; pembayaranId: strin
 interface Item {
   id: string;
   nominal: number;
+  metode: string;
   buktiUrl: string | null;
   createdAt: string;
   user: { name: string };
@@ -158,7 +159,14 @@ export default function ValidasiPage() {
                   <p className="text-lg font-extrabold text-slate-900">Rp{p.nominal.toLocaleString("id-ID")}</p>
                 </div>
 
-                {p.buktiUrl && <BuktiTransfer url={p.buktiUrl} pembayaranId={p.id} />}
+                {p.buktiUrl ? (
+                  <BuktiTransfer url={p.buktiUrl} pembayaranId={p.id} />
+                ) : (
+                  <div className="mt-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+                    💳 Pembayaran <b>{p.metode.replace(/_/g, " ")}</b> — tanpa bukti upload.
+                    Cek mutasi rekening bank RT sebelum memvalidasi.
+                  </div>
+                )}
 
                 <input
                   value={catatan[p.id] ?? ""}
