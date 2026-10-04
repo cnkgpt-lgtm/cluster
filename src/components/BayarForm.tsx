@@ -52,6 +52,7 @@ export default function BayarForm({
   const [metode, setMetode] = useState("QRIS");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [namaFile, setNamaFile] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function bayarOnline() {
@@ -143,12 +144,20 @@ export default function BayarForm({
             Transfer sebesar <b>Rp{nominal.toLocaleString("id-ID")}</b> ke rekening bendahara RT,
             lalu unggah bukti transfer di bawah. Pembayaran aktif setelah divalidasi bendahara.
           </p>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,application/pdf"
-            className="mt-3 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
-          />
+          <label className="mt-3 flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border-2 border-dashed border-amber-300 bg-white px-4 py-6 text-center transition hover:border-amber-400 hover:bg-amber-50">
+            <span className="text-3xl">📤</span>
+            <span className="text-sm font-bold text-amber-800">
+              {namaFile ? `📄 ${namaFile}` : "Ketuk untuk upload bukti transfer"}
+            </span>
+            <span className="text-xs text-slate-500">JPG / PNG / WEBP / PDF, maks 5 MB</span>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              className="hidden"
+              onChange={(e) => setNamaFile(e.target.files?.[0]?.name ?? "")}
+            />
+          </label>
         </div>
       )}
 
