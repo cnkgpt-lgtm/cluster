@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, Empty, Badge } from "@/components/ui";
-import { isDriveLink, driveThumbnailUrl } from "@/lib/gdrive-link";
+import BuktiViewer from "@/components/BuktiViewer";
 
 const STORAGE_INFO: Record<string, { label: string; icon: string; ok: boolean }> = {
   R2: { label: "Cloudflare R2", icon: "☁️", ok: true },
@@ -46,99 +46,6 @@ function StatusPenyimpanan() {
   );
 }
 
-function BuktiTransfer({ url, pembayaranId }: { url: string; pembayaranId: string }) {
-  const [lihat, setLihat] = useState(false);
-  const [pdfMode, setPdfMode] = useState(false);
-  const bukaModal = () => {
-    setPdfMode(false);
-    setLihat(true);
-  };
-
-  if (url.startsWith("tg:")) {
-    const proxy = `/api/pembayaran/${pembayaranId}/bukti`;
-    return (
-      <div className="mt-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={proxy}
-          alt="Bukti transfer"
-          onClick={bukaModal}
-          className="max-h-64 cursor-zoom-in rounded-xl border border-slate-200"
-        />
-        <div className="mt-2 flex flex-wrap gap-2">
-          <button
-            onClick={bukaModal}
-            className="rounded-xl bg-sky-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-sky-700"
-          >
-            👁️ Lihat di Sini
-          </button>
-          <a
-            href={proxy}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-xl bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-200"
-          >
-            ↗ Tab Baru
-          </a>
-        </div>
-        <p className="mt-1 text-xs text-slate-400">Tersimpan di Telegram — tampil tanpa mengunduh.</p>
-
-        {lihat && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-black/90 p-4" onClick={() => setLihat(false)}>
-            <button
-              onClick={() => setLihat(false)}
-              className="self-end rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
-            >
-              ✕ Tutup
-            </button>
-            <div
-              className="flex min-h-0 flex-1 items-center justify-center py-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {pdfMode ? (
-                <iframe src={proxy} title="Bukti transfer" className="h-full w-full max-w-4xl rounded-xl bg-white" />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={proxy}
-                  alt="Bukti transfer"
-                  onError={() => setPdfMode(true)}
-                  className="max-h-full max-w-full rounded-xl object-contain"
-                />
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-  if (isDriveLink(url)) {
-    const thumb = driveThumbnailUrl(url);
-    return (
-      <a href={url} target="_blank" rel="noreferrer" className="mt-3 block">
-        {thumb && !url.includes(".pdf") ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt="Bukti transfer" className="max-h-64 rounded-xl border border-slate-200" />
-        ) : null}
-        <span className="mt-2 inline-block rounded-xl bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-200">
-          📁 Lihat Bukti di Google Drive ↗
-        </span>
-      </a>
-    );
-  }
-  return (
-    <a href={url} target="_blank" rel="noreferrer" className="mt-3 block">
-      {url.endsWith(".pdf") ? (
-        <span className="inline-block rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
-          📄 Lihat Bukti (PDF)
-        </span>
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="Bukti transfer" className="max-h-64 rounded-xl border border-slate-200" />
-      )}
-    </a>
-  );
-}
 
 interface Item {
   id: string;
@@ -213,7 +120,7 @@ export default function ValidasiPage() {
                 </div>
 
                 {p.buktiUrl ? (
-                  <BuktiTransfer url={p.buktiUrl} pembayaranId={p.id} />
+                  <BuktiViewer url={p.buktiUrl} pembayaranId={p.id} />
                 ) : (
                   <div className="mt-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
                     💳 Pembayaran <b>{p.metode.replace(/_/g, " ")}</b> — tanpa bukti upload.

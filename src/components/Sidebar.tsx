@@ -25,6 +25,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/iuran", label: "Iuran", icon: "💳" },
     { href: "/tagihan", label: "Kelola Tagihan", icon: "🧾" },
     { href: "/validasi", label: "Validasi Bayar", icon: "✅" },
+    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "🗂️" },
     { href: "/kas", label: "Kas", icon: "💰" },
     { href: "/pengeluaran", label: "Pengeluaran", icon: "💸" },
     { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
@@ -39,6 +40,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/iuran", label: "Iuran", icon: "💳" },
     { href: "/tagihan", label: "Kelola Tagihan", icon: "🧾" },
     { href: "/validasi", label: "Validasi Bayar", icon: "✅" },
+    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "🗂️" },
     { href: "/kas", label: "Kas", icon: "💰" },
     { href: "/pengeluaran", label: "Pengeluaran", icon: "💸" },
     { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
@@ -49,6 +51,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
   ],
   SEKRETARIS: [
     { href: "/dashboard", label: "Dashboard", icon: "🏠" },
+    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "🗂️" },
     { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
     { href: "/iuran", label: "Iuran Saya", icon: "💳" },
     { href: "/cctv", label: "CCTV", icon: "📹" },
