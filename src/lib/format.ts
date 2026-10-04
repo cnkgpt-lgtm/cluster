@@ -67,3 +67,17 @@ const LABEL_JENIS: Record<string, string> = {
 export function labelJenis(j: string): string {
   return LABEL_JENIS[j] ?? j;
 }
+
+const NAMA_BULAN = [
+  "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI",
+  "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER",
+];
+
+// "2026-10" -> "OKTOBER 2026" (untuk kolom bulan kartu kontrol)
+export function labelBulan(periode: string): string {
+  const m = periode.match(/^(\d{4})-(\d{2})$/);
+  if (!m) return periode;
+  const idx = parseInt(m[2], 10) - 1;
+  if (idx < 0 || idx > 11) return periode;
+  return `${NAMA_BULAN[idx]} ${m[1]}`;
+}

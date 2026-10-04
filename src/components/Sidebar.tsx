@@ -14,6 +14,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
   WARGA: [
     { href: "/dashboard", label: "Dashboard", icon: "🏠" },
     { href: "/iuran", label: "Iuran Saya", icon: "💳" },
+    { href: "/kartu-saya", label: "Kartu Saya", icon: "🪪" },
     { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },

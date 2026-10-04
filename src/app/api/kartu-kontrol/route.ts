@@ -6,20 +6,31 @@ export const dynamic = "force-dynamic";
 
 const BOLEH = ["BENDAHARA", "PENGURUS", "SEKRETARIS"] as const;
 
-function cekAkses(role?: string) {
-  return !!role && (BOLEH as readonly string[]).includes(role);
+function bolehLihat(role: string | undefined, userIdDiminta: string | null, userIdSendiri: string) {
+  // Bendahara/Pengurus/Sekretaris boleh lihat semua kartu warga.
+  if (!!role && (BOLEH as readonly string[]).includes(role)) return true;
+  // Warga hanya boleh lihat kartu miliknya sendiri.
+  return role === "WARGA" && !!userIdDiminta && userIdDiminta === userIdSendiri;
 }
 
 // GET /api/kartu-kontrol — daftar warga + ringkasan pembayaran (Bendahara/Pengurus/Sekretaris)
 // GET /api/kartu-kontrol?userId=xxx — kartu kontrol 1 warga: tiap tagihan + tanggal & bukti bayar
 export async function GET(req: NextRequest) {
   const session = await auth();
-  const role = (session?.user as { role?: string } | undefined)?.role;
-  if (!session?.user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
-  if (!cekAkses(role)) return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  const user = session?.user as { id: string; role?: string } | undefined;
+  if (!user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
+
+  // Daftar semua warga: khusus Bendahara/Pengurus/Sekretaris.
+  if (!userId) {
+    if (!(BOLEH as readonly string[]).includes(user.role ?? "")) {
+      return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+    }
+  } else if (!bolehLihat(user.role, userId, user.id)) {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
 
   // ---------- Detail 1 warga ----------
   if (userId) {
@@ -41,6 +52,7 @@ export async function GET(req: NextRequest) {
           select: {
             id: true, metode: true, status: true, nominal: true,
             buktiUrl: true, paidAt: true, createdAt: true, validatedAt: true,
+            validatedBy: { select: { name: true } },
           },
         },
       },
@@ -67,10 +79,20 @@ export async function GET(req: NextRequest) {
               // tanggal bayar: paidAt (lunas) atau waktu transaksi/upload
               tanggalBayar: (bayar.paidAt ?? bayar.createdAt).toISOString(),
               validatedAt: bayar.validatedAt?.toISOString() ?? null,
+              penerima: bayar.validatedBy?.name ?? (bayar.metode === "QRIS" ? "Otomatis" : null),
             }
           : null,
       };
     });
+
+    // Tim pengelola untuk blok tanda tangan kartu.
+    const pengelola = await prisma.user.findMany({
+      where: { role: { in: ["PENGURUS", "SEKRETARIS", "BENDAHARA"] }, isActive: true },
+      select: { name: true, role: true },
+      orderBy: { createdAt: "asc" },
+      take: 10,
+    });
+    const namaPeran = (r: string) => pengelola.find((p) => p.role === r)?.name ?? null;
 
     const ringkasan = {
       totalTagihan: items.length,
@@ -83,7 +105,16 @@ export async function GET(req: NextRequest) {
         .reduce((s, i) => s + i.nominal, 0),
     };
 
-    return NextResponse.json({ warga, ringkasan, items });
+    return NextResponse.json({
+      warga,
+      ringkasan,
+      items,
+      pengelola: {
+        ketua: namaPeran("PENGURUS"),
+        sekretaris: namaPeran("SEKRETARIS"),
+        bendahara: namaPeran("BENDAHARA"),
+      },
+    });
   }
 
   // ---------- Daftar semua warga ----------
