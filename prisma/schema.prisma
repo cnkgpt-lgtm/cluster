@@ -18,6 +18,7 @@ enum Role {
   PENGURUS
   BENDAHARA
   SEKRETARIS
+  SECURITY
 }
 
 enum JenisTagihan {
@@ -84,6 +85,7 @@ model User {
   pembayaranDivalidasi Pembayaran[] @relation("PembayaranDivalidasiOleh")
   notifikasi       Notifikasi[]
   pengeluaranKas   PengeluaranKas[] @relation("KasDicatatOleh")
+  absensi          Absensi[]
 
   @@map("users")
 }
@@ -214,4 +216,38 @@ model PengeluaranKas {
   createdAt    DateTime @default(now())
 
   @@map("pengeluaran_kas")
+}
+
+// Absensi security: 1 baris per user per hari (tanggal = 00:00 WITA).
+// Selfie wajah wajib saat jam masuk & jam pulang; lokasi dicek (geofence).
+model Absensi {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tanggal    DateTime
+  jamMasuk   DateTime?
+  jamPulang  DateTime?
+  fotoMasuk  String?
+  fotoPulang String?
+  latMasuk   Float?
+  lngMasuk   Float?
+  latPulang  Float?
+  lngPulang  Float?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([userId, tanggal])
+  @@map("absensi")
+}
+
+// Titik & radius geofence absensi (diatur pengurus lewat peta). Satu baris.
+model LokasiAbsensi {
+  id          String   @id @default("perumahan")
+  nama        String   @default("Perumahan")
+  latitude    Float
+  longitude   Float
+  radiusMeter Int      @default(200)
+  updatedAt   DateTime @updatedAt
+
+  @@map("lokasi_absensi")
 }

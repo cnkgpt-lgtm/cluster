@@ -33,6 +33,8 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },
+    { href: "/absensi/rekap", label: "Absensi", icon: "🛡️" },
+    { href: "/pengaturan/lokasi", label: "Lokasi", icon: "🗺️" },
     { href: "/pengguna", label: "Pengguna", icon: "⚙️" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
     { href: "/profil", label: "Profil Saya", icon: "👤" },
@@ -49,6 +51,7 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },
+    { href: "/absensi/rekap", label: "Absensi", icon: "🛡️" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
     { href: "/profil", label: "Profil Saya", icon: "👤" },
   ],
@@ -60,6 +63,14 @@ export const NAV_PER_ROLE: Record<string, NavItem[]> = {
     { href: "/iuran", label: "Iuran Saya", icon: "💳" },
     { href: "/cctv", label: "CCTV", icon: "📹" },
     { href: "/warga", label: "Info Warga", icon: "👥" },
+    { href: "/absensi/rekap", label: "Absensi", icon: "🛡️" },
+    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
+    { href: "/profil", label: "Profil Saya", icon: "👤" },
+  ],
+  SECURITY: [
+    { href: "/dashboard", label: "Dashboard", icon: "🏠" },
+    { href: "/absensi", label: "Absensi", icon: "🛡️" },
+    { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
     { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
     { href: "/profil", label: "Profil Saya", icon: "👤" },
   ],
@@ -70,6 +81,7 @@ const ROLE_LABEL: Record<string, string> = {
   PENGURUS: "Pengurus",
   BENDAHARA: "Bendahara",
   SEKRETARIS: "Sekretaris",
+  SECURITY: "Security",
 };
 
 export default function Sidebar({

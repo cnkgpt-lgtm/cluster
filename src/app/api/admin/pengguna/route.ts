@@ -24,7 +24,7 @@ const createSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.string().email(),
   password: z.string().min(6).max(100),
-  role: z.enum(["WARGA", "PENGURUS", "BENDAHARA", "SEKRETARIS"]),
+  role: z.enum(["WARGA", "PENGURUS", "BENDAHARA", "SEKRETARIS", "SECURITY"]),
   blok: z.string().max(10).optional(),
   nomorRumah: z.string().max(10).optional(),
   phone: z.string().max(20).optional(),

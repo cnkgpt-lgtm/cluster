@@ -15,7 +15,7 @@ interface Pengguna {
   isActive: boolean;
 }
 
-const ROLES = ["WARGA", "PENGURUS", "BENDAHARA", "SEKRETARIS"];
+const ROLES = ["WARGA", "PENGURUS", "BENDAHARA", "SEKRETARIS", "SECURITY"];
 
 export default function PenggunaPage() {
   const [items, setItems] = useState<Pengguna[]>([]);

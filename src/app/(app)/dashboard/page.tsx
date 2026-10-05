@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import { rupiah, formatTanggalWita } from "@/lib/format";
+import { rupiah, formatTanggalWita, formatTanggalWaktuWita } from "@/lib/format";
 import { StatCard, Card, badgeStatusBayar, Empty } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -65,6 +65,79 @@ export default async function DashboardPage() {
               ))}
             </ul>
           )}
+        </Card>
+
+        <Card
+          title="Pengumuman Terbaru"
+          action={<Link href="/pengumuman" className="text-sm font-semibold text-emerald-700 hover:underline">Lihat semua →</Link>}
+        >
+          {pengumuman.length === 0 ? (
+            <Empty icon="📭" title="Belum ada pengumuman" />
+          ) : (
+            <ul className="space-y-3">
+              {pengumuman.map((p) => (
+                <li key={p.id}>
+                  <Link href={`/pengumuman/${p.id}`} className="block rounded-xl border border-slate-100 p-3 transition hover:border-emerald-200 hover:bg-emerald-50/50">
+                    <p className="font-semibold text-slate-800">{p.judul}</p>
+                    <p className="text-xs text-slate-500">{formatTanggalWita(p.createdAt)} · {p.kategori}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      </div>
+    );
+  }
+
+  // SECURITY — ringkasan shift hari ini
+  if (role === "SECURITY") {
+    const { awalHariWita } = await import("@/lib/absensi");
+    const hariIni = await prisma.absensi.findUnique({
+      where: { userId_tanggal: { userId: user.id, tanggal: awalHariWita() } },
+    });
+    const pengumuman = await prisma.pengumuman.findMany({
+      where: { isPublished: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    });
+    return (
+      <div className="anim-stagger space-y-6">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+            Halo, {user.name?.split(" ")[0]} 🛡️
+          </h1>
+          <p className="text-sm text-slate-500">Shift jaga hari ini.</p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <StatCard
+            label="Jam Masuk"
+            value={hariIni?.jamMasuk ? formatTanggalWaktuWita(hariIni.jamMasuk).split(", ")[1] ?? "—" : "Belum absen"}
+            sub="hari ini"
+            icon="🟢"
+            tone="emerald"
+          />
+          <StatCard
+            label="Jam Pulang"
+            value={hariIni?.jamPulang ? formatTanggalWaktuWita(hariIni.jamPulang).split(", ")[1] ?? "—" : "—"}
+            sub="hari ini"
+            icon="🔴"
+            tone="sky"
+          />
+        </div>
+
+        <Card
+          title="Absensi Shift"
+          action={<Link href="/absensi" className="text-sm font-semibold text-emerald-700 hover:underline">Buka absensi →</Link>}
+        >
+          <p className="text-sm text-slate-600">
+            {!hariIni?.jamMasuk
+              ? "Anda belum absen masuk hari ini. Ketuk tombol Absen Masuk dengan selfie wajah di area perumahan."
+              : hariIni.jamPulang
+                ? "Shift hari ini selesai. Terima kasih! 🙏"
+                : "Anda sedang bertugas. Jangan lupa absen pulang saat shift berakhir."}
+          </p>
         </Card>
 
         <Card
