@@ -17,7 +17,17 @@ export async function GET() {
   });
 }
 
-// PUT /api/lokasi-absensi — atur titik & radius lewat peta (khusus PENGURUS)
+// DELETE /api/lokasi-absensi — hapus titik (khusus PENGURUS)
+export async function DELETE() {
+  const session = await auth();
+  const role = (session?.user as { role?: string } | undefined)?.role;
+  if (!session?.user) return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  if (role !== "PENGURUS") {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
+  await prisma.lokasiAbsensi.deleteMany({ where: { id: "perumahan" } });
+  return NextResponse.json({ ok: true });
+}
 export async function PUT(req: NextRequest) {
   const session = await auth();
   const role = (session?.user as { role?: string } | undefined)?.role;

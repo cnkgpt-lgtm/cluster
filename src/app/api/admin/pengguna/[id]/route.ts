@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 // PATCH /api/admin/pengguna/[id] — ubah role / status aktif (Pengurus)
 const schema = z.object({
-  role: z.enum(["WARGA", "PENGURUS", "BENDAHARA", "SEKRETARIS"]).optional(),
+  role: z.enum(["WARGA", "PENGURUS", "BENDAHARA", "SEKRETARIS", "SECURITY"]).optional(),
   isActive: z.boolean().optional(),
   blok: z.string().max(10).optional(),
   nomorRumah: z.string().max(10).optional(),
