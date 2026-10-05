@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { createSnapTransaction, isMockMode } from "@/lib/midtrans";
 import { simpanBukti } from "@/lib/r2";
+import { rupiah, labelMetode, formatTanggalWaktuWita } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -68,7 +69,30 @@ export async function POST(req: NextRequest) {
     }
     let buktiUrl: string;
     try {
-      buktiUrl = await simpanBukti(buktiFile);
+      // Nama file & caption Telegram: nama user, role, keterangan tagihan.
+      const pemilik = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { name: true, role: true },
+      });
+      const labelRole: Record<string, string> = {
+        WARGA: "Warga", PENGURUS: "Pengurus", BENDAHARA: "Bendahara",
+        SEKRETARIS: "Sekretaris", SECURITY: "Security",
+      };
+      const namaBersih = (pemilik?.name ?? user.name ?? "warga")
+        .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "warga";
+      const ext = buktiFile.type === "image/png" ? "png"
+        : buktiFile.type === "image/webp" ? "webp"
+        : buktiFile.type === "application/pdf" ? "pdf" : "jpg";
+      buktiUrl = await simpanBukti(buktiFile, {
+        namaFile: `bukti-${namaBersih}-${Date.now()}.${ext}`,
+        caption: [
+          "💳 Bukti pembayaran",
+          `👤 ${pemilik?.name ?? user.name} (${labelRole[pemilik?.role ?? ""] ?? pemilik?.role ?? "-"})`,
+          `🧾 ${tw.tagihan.judul} — ${rupiah(nominal)}`,
+          `🏦 ${labelMetode(metode)}`,
+          `🕐 ${formatTanggalWaktuWita(new Date())}`,
+        ].join("\n"),
+      });
     } catch (e) {
       return NextResponse.json(
         { error: "VALIDATION_ERROR", detail: e instanceof Error ? e.message : "upload gagal" },
@@ -88,7 +112,6 @@ export async function POST(req: NextRequest) {
     await prisma.tagihanWarga.update({ where: { id: tw.id }, data: { status: "MENUNGGU_VALIDASI" } });
     // Notifikasi ke bendahara agar segera divalidasi
     const { kirimNotifikasiKeRole } = await import("@/lib/notifikasi");
-    const { rupiah } = await import("@/lib/format");
     await kirimNotifikasiKeRole("BENDAHARA", {
       judul: "Bukti transfer perlu divalidasi",
       pesan: `${user.name} mengunggah bukti ${tw.tagihan.judul} (${rupiah(nominal)}).`,

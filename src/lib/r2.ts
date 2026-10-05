@@ -39,7 +39,10 @@ import { telegramStorageConfigured, uploadBuktiToTelegram } from "./telegram-sto
 // Prioritas: Cloudflare R2 → Google Drive → Telegram → data URL base64.
 // Data URL adalah fallback terakhir yang selalu bekerja (termasuk di Vercel
 // yang filesystem-nya read-only) bila tidak ada penyimpanan eksternal.
-export async function simpanBukti(file: File): Promise<string> {
+export async function simpanBukti(
+  file: File,
+  opts?: { namaFile?: string; caption?: string },
+): Promise<string> {
   validateFile(file);
   const key = `bukti/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, "0")}/${randomUUID()}.${extFromMime(file.type)}`;
   const bytes = Buffer.from(await file.arrayBuffer());
@@ -77,9 +80,13 @@ export async function simpanBukti(file: File): Promise<string> {
   }
 
   // Telegram (bot → channel/group pribadi; gratis, tanpa kartu kredit)
+  // Nama file & caption diisi agar mudah dikenali di Telegram.
   if (telegramStorageConfigured()) {
     try {
-      return await uploadBuktiToTelegram(file);
+      const untukTelegram = opts?.namaFile
+        ? new File([bytes], opts.namaFile, { type: file.type })
+        : new File([bytes], (file as { name?: string }).name || "bukti", { type: file.type });
+      return await uploadBuktiToTelegram(untukTelegram, opts?.caption);
     } catch (e) {
       console.error("Upload Telegram gagal, fallback ke data URL:", e);
     }

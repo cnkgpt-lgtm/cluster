@@ -121,7 +121,19 @@ export async function POST(req: NextRequest) {
 
   let refFoto: string;
   try {
-    refFoto = await simpanBukti(foto);
+    // Nama file & caption Telegram: nama user, role, keterangan absen.
+    const namaBersih = (me.name ?? "security")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "security";
+    const ext = foto.type === "image/png" ? "png" : foto.type === "image/webp" ? "webp" : "jpg";
+    refFoto = await simpanBukti(foto, {
+      namaFile: `absensi-${tipe}-${namaBersih}-${Date.now()}.${ext}`,
+      caption: [
+        tipe === "masuk" ? "🛡️ Absen MASUK" : "🛡️ Absen PULANG",
+        `👤 ${me.name ?? "-"} (Security)`,
+        `🕐 ${formatTanggalWaktuWita(sekarang)}`,
+        `📍 ${jarak} m dari titik`,
+      ].join("\n"),
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "UPLOAD_GAGAL";
     return NextResponse.json({ error: "UPLOAD_GAGAL", detail: msg }, { status: 400 });
