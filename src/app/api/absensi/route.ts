@@ -119,6 +119,26 @@ export async function POST(req: NextRequest) {
   const sekarang = new Date();
   const kunci = { userId_tanggal: { userId: me.id, tanggal } };
 
+  // Cek status dulu SEBELUM upload — jangan buang upload bila sudah absen.
+  const ada = await prisma.absensi.findUnique({ where: kunci });
+  if (tipe === "masuk" && ada?.jamMasuk) {
+    return NextResponse.json(
+      { error: "SUDAH_ABSEN_MASUK", jamMasuk: formatTanggalWaktuWita(ada.jamMasuk) },
+      { status: 409 },
+    );
+  }
+  if (tipe === "pulang") {
+    if (!ada?.jamMasuk) {
+      return NextResponse.json({ error: "BELUM_ABSEN_MASUK" }, { status: 409 });
+    }
+    if (ada.jamPulang) {
+      return NextResponse.json(
+        { error: "SUDAH_ABSEN_PULANG", jamPulang: formatTanggalWaktuWita(ada.jamPulang) },
+        { status: 409 },
+      );
+    }
+  }
+
   let refFoto: string;
   try {
     // Nama file & caption Telegram: nama user, role, keterangan absen.
@@ -140,13 +160,6 @@ export async function POST(req: NextRequest) {
   }
 
   if (tipe === "masuk") {
-    const ada = await prisma.absensi.findUnique({ where: kunci });
-    if (ada?.jamMasuk) {
-      return NextResponse.json(
-        { error: "SUDAH_ABSEN_MASUK", jamMasuk: formatTanggalWaktuWita(ada.jamMasuk) },
-        { status: 409 },
-      );
-    }
     const a = await prisma.absensi.upsert({
       where: kunci,
       create: {
@@ -161,17 +174,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // pulang
-  const ada = await prisma.absensi.findUnique({ where: kunci });
-  if (!ada?.jamMasuk) {
-    return NextResponse.json({ error: "BELUM_ABSEN_MASUK" }, { status: 409 });
-  }
-  if (ada.jamPulang) {
-    return NextResponse.json(
-      { error: "SUDAH_ABSEN_PULANG", jamPulang: formatTanggalWaktuWita(ada.jamPulang) },
-      { status: 409 },
-    );
-  }
+  // pulang (status sudah dicek di atas sebelum upload)
   const a = await prisma.absensi.update({
     where: kunci,
     data: { jamPulang: sekarang, fotoPulang: refFoto, latPulang: lat, lngPulang: lng },
