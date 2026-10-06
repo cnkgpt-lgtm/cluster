@@ -56,7 +56,7 @@ export function FormPengeluaran() {
     <div>
       <button
         onClick={() => setOpen((s) => !s)}
-        className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 active:scale-[0.99]"
+        className="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-[0.99]"
       >
         {open ? "Tutup" : "+ Catat Pengeluaran"}
       </button>
@@ -123,7 +123,7 @@ export function FormPengeluaran() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-60"
+                className="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-[0.99] disabled:opacity-60"
               >
                 {saving ? "Menyimpan..." : "Simpan Pengeluaran"}
               </button>

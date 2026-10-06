@@ -137,9 +137,9 @@ export default function Sidebar({
             key={item.href}
             href={item.href}
             onClick={() => setOpen(false)}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 ${
               aktif
-                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/25"
+                ? "bg-emerald-700 text-white shadow-md shadow-emerald-700/25"
                 : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
             }`}
           >
@@ -157,7 +157,7 @@ export default function Sidebar({
     <>
       {/* Bar atas mobile (tanpa hamburger — menu pindah ke bawah) */}
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
-        <img src="/logo/logo-stacked.svg" alt="SISTER — Sistem Informasi Cluster" className="h-9 w-auto" />
+        <img src="/logo/logo-stacked.svg" alt="Logo SISTER" className="h-9 w-auto" />
         <Link href="/notifikasi" className="rounded-lg border border-slate-200 p-2 text-slate-600">
           🔔
         </Link>
@@ -216,8 +216,8 @@ function TabBawah({ tab, pathname }: { tab: TabItem; pathname: string }) {
   return (
     <Link
       href={tab.href}
-      className={`flex flex-col items-center gap-1 py-2.5 transition active:scale-95 ${
-        aktif ? "text-emerald-600" : "text-slate-500"
+      className={`flex flex-col items-center gap-1 py-2.5 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-700 ${
+        aktif ? "text-emerald-700" : "text-slate-500"
       }`}
     >
       <span className="text-xl leading-none">{tab.icon}</span>
@@ -230,12 +230,12 @@ function TabBawah({ tab, pathname }: { tab: TabItem; pathname: string }) {
 function TabUtama({ tab, pathname }: { tab: TabItem; pathname: string }) {
   const aktif = tabAktif(pathname, tab.href);
   return (
-    <Link href={tab.href} className="flex flex-col items-center transition active:scale-95">
+    <Link href={tab.href} className="flex flex-col items-center transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:rounded-2xl">
       <span
         className={`-translate-y-3 rounded-2xl p-3.5 text-2xl leading-none shadow-lg transition ${
           aktif
-            ? "bg-emerald-700 text-white shadow-emerald-700/30"
-            : "bg-emerald-600 text-white shadow-emerald-600/30"
+            ? "bg-emerald-800 text-white shadow-emerald-800/30 ring-2 ring-emerald-700 ring-offset-2"
+            : "bg-emerald-700 text-white shadow-emerald-700/30"
         }`}
       >
         {tab.icon}
@@ -251,7 +251,7 @@ function SidebarHead({ user, onClose }: { user: { name: string; role: string }; 
   return (
     <div className="flex items-center justify-between border-b border-slate-100 px-5 py-5">
       <div>
-        <img src="/logo/logo-stacked.svg" alt="SISTER — Sistem Informasi Cluster" className="h-14 w-auto" />
+        <img src="/logo/logo-stacked.svg" alt="Logo SISTER" className="h-14 w-auto" />
       </div>
       {onClose && (
         <button onClick={onClose} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Tutup menu">

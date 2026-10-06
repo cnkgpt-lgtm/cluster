@@ -9,14 +9,13 @@ export function StatCard({
   value: string;
   sub?: string;
   icon: string;
-  tone?: "emerald" | "amber" | "red" | "sky" | "violet";
+  tone?: "emerald" | "amber" | "red" | "sky";
 }) {
   const tones: Record<string, string> = {
     emerald: "bg-emerald-50 text-emerald-700",
     amber: "bg-amber-50 text-amber-700",
     red: "bg-red-50 text-red-700",
     sky: "bg-sky-50 text-sky-700",
-    violet: "bg-violet-50 text-violet-700",
   };
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
