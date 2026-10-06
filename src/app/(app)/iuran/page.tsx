@@ -23,7 +23,7 @@ export default async function IuranPage() {
   );
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Iuran Saya</h1>
         <p className="text-sm text-slate-500">Bayar iuran via QRIS, Virtual Account, atau transfer manual.</p>
@@ -46,7 +46,7 @@ export default async function IuranPage() {
                   <span className="text-lg font-extrabold text-slate-900">{rupiah(t.nominal)}</span>
                   <Link
                     href={`/iuran/${t.id}`}
-                    className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700"
+                    className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800"
                   >
                     Bayar
                   </Link>

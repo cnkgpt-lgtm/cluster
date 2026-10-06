@@ -17,7 +17,7 @@ export default async function CctvPage() {
   });
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">CCTV Lingkungan</h1>
         <p className="text-sm text-slate-500">Pantau kamera keamanan perumahan secara langsung. Bisa dilihat semua warga.</p>

@@ -61,7 +61,7 @@ export default function KasPage() {
   const rp = (n: number) => "Rp" + n.toLocaleString("id-ID");
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Rekapitulasi Kas</h1>
@@ -71,7 +71,7 @@ export default function KasPage() {
           <input type="month" value={bulan} onChange={(e) => setBulan(e.target.value)}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500" />
           <button onClick={() => setShowForm((s) => !s)}
-            className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">
+            className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-800">
             {showForm ? "Tutup" : "+ Pengeluaran"}
           </button>
         </div>
@@ -111,7 +111,7 @@ export default function KasPage() {
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
             </div>
             <div className="sm:col-span-2">
-              <button disabled={saving} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60">
+              <button disabled={saving} className="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60">
                 {saving ? "Menyimpan..." : "Simpan Pengeluaran"}
               </button>
             </div>

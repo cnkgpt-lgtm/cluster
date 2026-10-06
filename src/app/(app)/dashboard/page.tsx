@@ -24,12 +24,9 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "desc" },
       take: 3,
     });
-    const lunasBulanIni = await prisma.pembayaran.count({
-      where: { userId: user.id, status: "PAID" },
-    });
 
     return (
-      <div className="anim-stagger space-y-6">
+      <div className="anim-fade-up space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
             Halo, {user.name?.split(" ")[0]} 👋
@@ -37,19 +34,41 @@ export default async function DashboardPage() {
           <p className="text-sm text-slate-500">Ringkasan iuran dan informasi perumahan Anda.</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard label="Tagihan Belum Lunas" value={rupiah(totalBelum)} sub={`${tagihan.length} tagihan`} icon="🧾" tone="amber" />
-          <StatCard label="Pembayaran Lunas" value={String(lunasBulanIni)} sub="total tercatat" icon="✅" tone="emerald" />
-          <StatCard label="Pengumuman Baru" value={String(pengumuman.length)} sub="terbaru" icon="📢" tone="sky" />
-        </div>
+        {tagihan.length > 0 ? (
+          <div className="overflow-hidden rounded-2xl border border-amber-200 bg-amber-50">
+            <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-amber-800">
+                  {tagihan.length} tagihan belum lunas
+                </p>
+                <p className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">
+                  {rupiah(totalBelum)}
+                </p>
+                <p className="mt-1 text-xs text-amber-700">
+                  Jatuh tempo terdekat {formatTanggalWita(tagihan[0].tagihan.jatuhTempo)}
+                </p>
+              </div>
+              <Link
+                href="/iuran"
+                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-[0.98]"
+              >
+                Bayar Sekarang
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+            <p className="text-3xl">🎉</p>
+            <p className="mt-2 font-bold text-slate-900">Semua tagihan lunas</p>
+            <p className="text-sm text-slate-500">Tidak ada tagihan yang perlu dibayar.</p>
+          </div>
+        )}
 
-        <Card
-          title="Tagihan Perlu Dibayar"
-          action={<Link href="/iuran" className="text-sm font-semibold text-emerald-700 hover:underline">Lihat semua →</Link>}
-        >
-          {tagihan.length === 0 ? (
-            <Empty icon="🎉" title="Semua tagihan lunas" sub="Tidak ada tagihan yang perlu dibayar." />
-          ) : (
+        {tagihan.length > 0 && (
+          <Card
+            title="Tagihan Perlu Dibayar"
+            action={<Link href="/iuran" className="text-sm font-semibold text-emerald-700 hover:underline">Lihat semua →</Link>}
+          >
             <ul className="divide-y divide-slate-100">
               {tagihan.map((t) => (
                 <li key={t.id} className="flex items-center justify-between py-3">
@@ -64,8 +83,8 @@ export default async function DashboardPage() {
                 </li>
               ))}
             </ul>
-          )}
-        </Card>
+          </Card>
+        )}
 
         <Card
           title="Pengumuman Terbaru"
@@ -102,7 +121,7 @@ export default async function DashboardPage() {
       take: 3,
     });
     return (
-      <div className="anim-stagger space-y-6">
+      <div className="anim-fade-up space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
             Halo, {user.name?.split(" ")[0]} 🛡️
@@ -186,16 +205,40 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Dashboard {role === "BENDAHARA" ? "Bendahara" : "Pengurus"}</h1>
         <p className="text-sm text-slate-500">Kelola iuran, kas, dan validasi pembayaran warga.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      {menungguValidasi > 0 ? (
+        <div className="overflow-hidden rounded-2xl border border-amber-200 bg-amber-50">
+          <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Perlu tindakan Anda</p>
+              <p className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">
+                {menungguValidasi} <span className="text-lg font-bold">pembayaran menunggu validasi</span>
+              </p>
+              <p className="mt-1 text-xs text-amber-700">Bukti transfer manual dari warga, belum diperiksa.</p>
+            </div>
+            <Link
+              href="/validasi"
+              className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-[0.98]"
+            >
+              Validasi Sekarang
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+          <p className="font-bold text-slate-900">✅ Tidak ada antrean validasi</p>
+          <p className="text-sm text-slate-500">Semua pembayaran warga sudah diproses.</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         <StatCard label="Kas Masuk Bulan Ini" value={rupiah(kasMasuk._sum.nominal ?? 0)} icon="💰" tone="emerald" />
         <StatCard label="Pengeluaran Bulan Ini" value={rupiah(pengeluaran._sum.nominal ?? 0)} icon="🧾" tone="red" />
-        <StatCard label="Menunggu Validasi" value={String(menungguValidasi)} sub="bukti transfer manual" icon="⏳" tone="amber" />
         <StatCard label="Total Warga Aktif" value={String(totalWarga)} sub={`${tagihanAktif} tagihan belum bayar`} icon="👥" tone="sky" />
       </div>
 

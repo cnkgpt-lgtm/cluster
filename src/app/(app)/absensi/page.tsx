@@ -61,7 +61,7 @@ export default function AbsensiPage() {
         setPos({ lat: p.coords.latitude, lng: p.coords.longitude, akurasi: Math.round(p.coords.accuracy ?? 0) });
         setGpsError("");
       },
-      () => setGpsError("Izin lokasi ditolak — aktifkan GPS & izinkan akses lokasi."),
+      () => setGpsError("Izin lokasi ditolak. Aktifkan GPS dan izinkan akses lokasi."),
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 },
     );
     return () => navigator.geolocation.clearWatch(id);
@@ -220,7 +220,7 @@ export default function AbsensiPage() {
           onClick={() => bukaKamera("masuk")}
           disabled={!sudahMasuk ? false : true}
           className={`rounded-2xl px-4 py-4 text-sm font-extrabold shadow-md transition active:scale-95 disabled:opacity-40 ${
-            sudahMasuk ? "bg-slate-200 text-slate-500" : "bg-emerald-600 text-white shadow-emerald-600/25 hover:bg-emerald-700"
+            sudahMasuk ? "bg-slate-200 text-slate-500" : "bg-emerald-700 text-white shadow-emerald-700/25 hover:bg-emerald-800"
           }`}
         >
           📸 Absen Masuk
@@ -229,7 +229,7 @@ export default function AbsensiPage() {
           onClick={() => bukaKamera("pulang")}
           disabled={!sudahMasuk || sudahPulang}
           className={`rounded-2xl px-4 py-4 text-sm font-extrabold shadow-md transition active:scale-95 disabled:opacity-40 ${
-            sudahMasuk && !sudahPulang ? "bg-sky-600 text-white shadow-sky-600/25 hover:bg-sky-700" : "bg-slate-200 text-slate-500"
+            sudahMasuk && !sudahPulang ? "bg-sky-700 text-white shadow-sky-700/25 hover:bg-sky-800" : "bg-slate-200 text-slate-500"
           }`}
         >
           📸 Absen Pulang
@@ -279,7 +279,7 @@ export default function AbsensiPage() {
               {kameraError ? (
                 <div className="space-y-3 text-center">
                   <p className="text-sm text-red-600">{kameraError}</p>
-                  <label className="block cursor-pointer rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white">
+                  <label className="block cursor-pointer rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white">
                     📤 Upload Foto Selfie
                     <input
                       ref={fileRef}
@@ -300,7 +300,7 @@ export default function AbsensiPage() {
                   <button
                     onClick={ambilFoto}
                     disabled={mengirim}
-                    className="mt-4 w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white shadow-md transition active:scale-95 disabled:opacity-50"
+                    className="mt-4 w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white shadow-md transition active:scale-95 disabled:opacity-50"
                   >
                     {mengirim ? "⏳ Mengirim…" : "📸 Ambil & Kirim"}
                   </button>

@@ -40,7 +40,7 @@ export default function MockBayarPage() {
             📱
           </div>
           <p className="mt-3 text-center text-sm text-slate-500">
-            Mode mock aktif — tidak ada kunci Midtrans. QRIS otomatis lunas
+            Mode mock aktif. Tidak ada kunci Midtrans. QRIS otomatis lunas
             (tidak perlu validasi bendahara). Pilih hasil simulasi:
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function MockBayarPage() {
           <button
             onClick={() => simulasi("PAID")}
             disabled={!!loading}
-            className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="w-full rounded-xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60"
           >
             {loading === "PAID" ? "Memproses..." : "✅ Simulasikan Berhasil (Lunas)"}
           </button>
