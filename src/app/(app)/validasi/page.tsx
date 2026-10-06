@@ -36,7 +36,7 @@ function StatusPenyimpanan() {
       <span>
         Penyimpanan bukti: <b>{info.label}</b>
         {!info.ok && (
-          <span className="text-amber-700"> — sambungkan Telegram/Google Drive agar tersimpan permanen</span>
+          <span className="text-amber-700"> (sambungkan Telegram/Google Drive agar tersimpan permanen)</span>
         )}
       </span>
       <span className="ml-auto">
@@ -93,7 +93,7 @@ export default function ValidasiPage() {
   }
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Validasi Pembayaran</h1>
         <p className="text-sm text-slate-500">Periksa bukti transfer manual dari warga, lalu terima atau tolak.</p>
@@ -123,7 +123,7 @@ export default function ValidasiPage() {
                   <BuktiViewer url={p.buktiUrl} pembayaranId={p.id} />
                 ) : (
                   <div className="mt-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
-                    💳 Pembayaran <b>{p.metode.replace(/_/g, " ")}</b> — tanpa bukti upload.
+                    💳 Pembayaran <b>{p.metode.replace(/_/g, " ")}</b> tanpa bukti upload.
                     Cek mutasi rekening bank RT sebelum memvalidasi.
                   </div>
                 )}
@@ -139,7 +139,7 @@ export default function ValidasiPage() {
                   <button
                     onClick={() => putuskan(p.id, "TERIMA")}
                     disabled={acting === p.id}
-                    className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
+                    className="flex-1 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60"
                   >
                     {acting === p.id ? "Memproses..." : "✅ Terima & Lunaskan"}
                   </button>

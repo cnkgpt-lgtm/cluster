@@ -28,10 +28,6 @@ body {
   0% { opacity: 0; transform: scale(0.96); }
   100% { opacity: 1; transform: scale(1); }
 }
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.55; transform: scale(0.82); }
-}
 @keyframes shimmer {
   0% { background-position: -400px 0; }
   100% { background-position: 400px 0; }
@@ -40,15 +36,9 @@ body {
 .anim-fade-up { animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .anim-fade-in { animation: fadeIn 0.35s ease both; }
 .anim-pop { animation: popIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.anim-stagger > * { animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.anim-stagger > *:nth-child(1) { animation-delay: 0.03s; }
-.anim-stagger > *:nth-child(2) { animation-delay: 0.09s; }
-.anim-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-.anim-stagger > *:nth-child(4) { animation-delay: 0.21s; }
-.anim-stagger > *:nth-child(5) { animation-delay: 0.27s; }
-.anim-stagger > *:nth-child(6) { animation-delay: 0.33s; }
 
-.live-dot { animation: pulseDot 1.6s ease-in-out infinite; }
+/* Indikator LIVE: satu titik merah statis menandai stream aktif (tanpa denyut). */
+.live-dot { display: inline-block; }
 
 .skeleton {
   background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);

@@ -37,7 +37,7 @@ export default function BuktiViewer({
         <div className="mt-2 flex flex-wrap gap-2">
           <button
             onClick={bukaModal}
-            className="rounded-xl bg-sky-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-sky-700"
+            className="rounded-xl bg-sky-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-sky-800"
           >
             👁️ Lihat di Sini
           </button>
@@ -51,7 +51,7 @@ export default function BuktiViewer({
           </a>
         </div>
         {!ringkas && (
-          <p className="mt-1 text-xs text-slate-400">Tersimpan di Telegram — tampil tanpa mengunduh.</p>
+          <p className="mt-1 text-xs text-slate-400">Tersimpan di Telegram, tampil tanpa mengunduh.</p>
         )}
 
         {lihat && (

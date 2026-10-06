@@ -40,7 +40,7 @@ export default function PengumumanForm() {
     <div>
       <button
         onClick={() => setOpen((s) => !s)}
-        className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
+        className="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-800"
       >
         {open ? "Tutup" : "+ Pengumuman Baru"}
       </button>
@@ -68,7 +68,7 @@ export default function PengumumanForm() {
               <textarea required value={isi} onChange={(e) => setIsi(e.target.value)} rows={5} maxLength={20000}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
             </div>
-            <button disabled={saving} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60">
+            <button disabled={saving} className="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60">
               {saving ? "Menyimpan..." : "Terbitkan"}
             </button>
           </form>

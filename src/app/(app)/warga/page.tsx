@@ -28,7 +28,7 @@ export default async function WargaPage() {
   const warga = items.filter((u) => u.role === "WARGA");
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Info Warga</h1>
         <p className="text-sm text-slate-500">Direktori pengurus dan warga perumahan.</p>

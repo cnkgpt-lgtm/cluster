@@ -20,13 +20,13 @@ declare global {
 }
 
 const METODE = [
-  { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun — otomatis lunas", icon: "📱" },
-  { id: "VA_BCA", label: "VA BCA", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
-  { id: "VA_BRI", label: "VA BRI", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
-  { id: "VA_BNI", label: "VA BNI", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
-  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
-  { id: "VA_PERMATA", label: "VA Permata", desc: "Upload bukti transfer — validasi bendahara", icon: "🏦" },
-  { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti — validasi bendahara", icon: "🧾" },
+  { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun, otomatis lunas", icon: "📱" },
+  { id: "VA_BCA", label: "VA BCA", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
+  { id: "VA_BRI", label: "VA BRI", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
+  { id: "VA_BNI", label: "VA BNI", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
+  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
+  { id: "VA_PERMATA", label: "VA Permata", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
+  { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti untuk validasi bendahara", icon: "🧾" },
 ];
 
 // Metode yang memakai upload bukti (bukan otomatis): VA & transfer manual.
@@ -172,7 +172,7 @@ export default function BayarForm({
       <button
         onClick={perluBukti(metode) ? bayarDenganBukti : bayarOnline}
         disabled={loading}
-        className="w-full rounded-2xl bg-emerald-600 px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 active:scale-[0.99] disabled:opacity-60"
+        className="w-full rounded-2xl bg-emerald-700 px-4 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-[0.99] disabled:opacity-60"
       >
         {loading
           ? "Memproses..."
