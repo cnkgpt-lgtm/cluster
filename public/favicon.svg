@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>SISTER Klaster</title><g transform="translate(-43.01 -56.37) scale(1.336)">
+  
+  <rect x="36" y="128" width="184" height="56" rx="10" fill="#111111"/>
+  <rect x="96" y="128" width="64" height="56" fill="#F5A524"/>
+  <path d="M 36 128 L 64 100 L 92 128 L 128 92 L 164 128 L 192 100 L 220 128"
+        fill="none" stroke="#0E7C4B" stroke-width="22"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</g></svg>

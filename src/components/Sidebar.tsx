@@ -157,7 +157,7 @@ export default function Sidebar({
     <>
       {/* Bar atas mobile (tanpa hamburger — menu pindah ke bawah) */}
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
-        <span className="text-lg font-bold text-emerald-700">🌿 RTKu</span>
+        <img src="/logo/logo-stacked.svg" alt="SISTER — Sistem Informasi Cluster" className="h-9 w-auto" />
         <Link href="/notifikasi" className="rounded-lg border border-slate-200 p-2 text-slate-600">
           🔔
         </Link>
@@ -251,8 +251,7 @@ function SidebarHead({ user, onClose }: { user: { name: string; role: string }; 
   return (
     <div className="flex items-center justify-between border-b border-slate-100 px-5 py-5">
       <div>
-        <p className="text-xl font-extrabold tracking-tight text-emerald-700">🌿 RTKu</p>
-        <p className="text-xs text-slate-500">RT/R Perumahan</p>
+        <img src="/logo/logo-stacked.svg" alt="SISTER — Sistem Informasi Cluster" className="h-14 w-auto" />
       </div>
       {onClose && (
         <button onClick={onClose} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Tutup menu">

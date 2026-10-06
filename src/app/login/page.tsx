@@ -36,10 +36,8 @@ function LoginForm() {
 
   return (
     <div className="anim-fade-up w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/60">
-      <div className="mb-6 text-center">
-        <p className="text-4xl">🌿</p>
-        <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">RTKu</h1>
-        <p className="mt-1 text-sm text-slate-500">Aplikasi RT/R Perumahan</p>
+      <div className="mb-6 flex flex-col items-center text-center">
+        <img src="/logo/logo-stacked.svg" alt="SISTER — Sistem Informasi Cluster" className="w-52 max-w-full" />
       </div>
 
       {error && (

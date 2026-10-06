@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <title>SISTER — simbol Klaster (master berwarna)</title>
+  <rect x="36" y="128" width="56" height="56" rx="10" fill="#111111"/>
+  <rect x="96" y="128" width="64" height="56" rx="10" fill="#F5A524"/>
+  <rect x="164" y="128" width="56" height="56" rx="10" fill="#111111"/>
+  <path d="M 36 128 L 64 100 L 92 128 L 128 92 L 164 128 L 192 100 L 220 128"
+        fill="none" stroke="#0E7C4B" stroke-width="22"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
