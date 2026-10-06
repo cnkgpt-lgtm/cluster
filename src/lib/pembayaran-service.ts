@@ -45,13 +45,40 @@ export async function prosesHasilPembayaran(
   const data: Record<string, unknown> = { status: statusEfektif };
   if (statusEfektif === "PAID") data.paidAt = new Date();
 
-  await prisma.$transaction([
-    prisma.pembayaran.update({ where: { id: pembayaranId }, data }),
-    prisma.tagihanWarga.update({
+  // Guard ATOMIK di dalam transaksi (hasil audit keamanan run-1):
+  // status dibaca ulang & transisi divalidasi terhadap state saat commit,
+  // bukan terhadap hasil baca sebelum transaksi. Penulis terakhir yang
+  // kedaluwarsa mendapat CONCURRENT_CONFLICT, bukan menimpa status terminal.
+  await prisma.$transaction(async (tx) => {
+    const kini = await tx.pembayaran.findUnique({
+      where: { id: pembayaranId },
+      select: { status: true },
+    });
+    if (!kini) throw new Error("ORDER_NOT_FOUND");
+    const dariKini = kini.status as StatusPembayaran;
+    if (dariKini === statusEfektif) return; // idempoten
+    assertTransition(dariKini, statusEfektif);
+
+    const upd = await tx.pembayaran.updateMany({
+      where: { id: pembayaranId, status: dariKini },
+      data,
+    });
+    if (upd.count === 0) throw new Error("CONCURRENT_CONFLICT");
+
+    // Jangan biarkan pembayaran duplikat yang berakhir EXPIRED/DITOLAK
+    // menimpa status LUNAS milik pembayaran sah pada tagihan yang sama
+    // (hasil audit keamanan run-1): LUNAS bersifat sticky.
+    const tw = await tx.tagihanWarga.findUnique({
       where: { id: pembayaran.tagihanWargaId },
-      data: { status: statusTagihanDariPembayaran(statusEfektif) },
-    }),
-  ]);
+      select: { status: true },
+    });
+    const mapped = statusTagihanDariPembayaran(statusEfektif);
+    const finalStatus = tw?.status === "LUNAS" && mapped !== "LUNAS" ? "LUNAS" : mapped;
+    await tx.tagihanWarga.update({
+      where: { id: pembayaran.tagihanWargaId },
+      data: { status: finalStatus },
+    });
+  });
 
   const judul = pembayaran.tagihanWarga.tagihan.judul;
   const nominal = rupiah(pembayaran.nominal);

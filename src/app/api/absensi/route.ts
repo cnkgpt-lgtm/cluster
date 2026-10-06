@@ -121,6 +121,10 @@ export async function POST(req: NextRequest) {
 
   // Cek status dulu SEBELUM upload — jangan buang upload bila sudah absen.
   const ada = await prisma.absensi.findUnique({ where: kunci });
+  // Record yang akan ditutup untuk tipe=pulang. Normalnya record hari ini;
+  // bila shift melewati tengah malam WITA (masuk kemarin, pulang hari ini),
+  // pakai shift terbuka terakhir (hasil audit keamanan run-1).
+  let target = ada;
   if (tipe === "masuk" && ada?.jamMasuk) {
     return NextResponse.json(
       { error: "SUDAH_ABSEN_MASUK", jamMasuk: formatTanggalWaktuWita(ada.jamMasuk) },
@@ -129,11 +133,17 @@ export async function POST(req: NextRequest) {
   }
   if (tipe === "pulang") {
     if (!ada?.jamMasuk) {
+      target = await prisma.absensi.findFirst({
+        where: { userId: me.id, jamMasuk: { not: null }, jamPulang: null },
+        orderBy: { tanggal: "desc" },
+      });
+    }
+    if (!target?.jamMasuk) {
       return NextResponse.json({ error: "BELUM_ABSEN_MASUK" }, { status: 409 });
     }
-    if (ada.jamPulang) {
+    if (target.jamPulang) {
       return NextResponse.json(
-        { error: "SUDAH_ABSEN_PULANG", jamPulang: formatTanggalWaktuWita(ada.jamPulang) },
+        { error: "SUDAH_ABSEN_PULANG", jamPulang: formatTanggalWaktuWita(target.jamPulang) },
         { status: 409 },
       );
     }
@@ -174,9 +184,10 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // pulang (status sudah dicek di atas sebelum upload)
+  // pulang (status sudah dicek di atas sebelum upload; target bisa record
+  // hari sebelumnya bila shift melewati tengah malam)
   const a = await prisma.absensi.update({
-    where: kunci,
+    where: { id: target!.id },
     data: { jamPulang: sekarang, fotoPulang: refFoto, latPulang: lat, lngPulang: lng },
   });
   return NextResponse.json({

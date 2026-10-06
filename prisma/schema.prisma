@@ -75,6 +75,9 @@ model User {
   blok         String?  // Blok perumahan, mis. "A"
   nomorRumah   String?  // Nomor rumah, mis. "12"
   isActive     Boolean  @default(true)
+  // Versi sesi: dinaikkan setiap role/isActive/password berubah agar JWT lama
+  // yang masih beredar langsung tidak berlaku (revokasi server-side).
+  sessionVersion Int     @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -150,15 +153,20 @@ model Pembayaran {
   @@map("pembayaran")
 }
 
-// Dedup/idempotensi event webhook Midtrans (transaction_id unik)
+// Dedup/idempotensi event webhook Midtrans.
+// Kunci = (transaction_id, transaction_status): satu transaksi Midtrans memakai
+// transaction_id yang sama sepanjang siklusnya (pending -> settlement), sehingga
+// dedupe HANYA boleh menelan redelivery notifikasi yang identik, bukan
+// perubahan status yang sah.
 model MidtransEvent {
   id                String   @id @default(cuid())
   orderId           String
-  transactionId     String   @unique
+  transactionId     String
   transactionStatus String
   rawPayload        Json
   createdAt         DateTime @default(now())
 
+  @@unique([transactionId, transactionStatus])
   @@map("midtrans_events")
 }
 

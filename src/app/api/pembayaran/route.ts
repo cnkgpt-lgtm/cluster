@@ -99,16 +99,26 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    const pembayaran = await prisma.pembayaran.create({
-      data: {
-        tagihanWargaId: tw.id,
-        userId: user.id,
-        metode: metode as "TRANSFER_MANUAL" | "VA_BCA" | "VA_BNI" | "VA_BRI" | "VA_MANDIRI" | "VA_PERMATA",
-        nominal,
-        status: "MENUNGGU_VALIDASI",
-        buktiUrl,
-      },
-    });
+    let pembayaran;
+    try {
+      pembayaran = await prisma.pembayaran.create({
+        data: {
+          tagihanWargaId: tw.id,
+          userId: user.id,
+          metode: metode as "TRANSFER_MANUAL" | "VA_BCA" | "VA_BNI" | "VA_BRI" | "VA_MANDIRI" | "VA_PERMATA",
+          nominal,
+          status: "MENUNGGU_VALIDASI",
+          buktiUrl,
+        },
+      });
+    } catch (e) {
+      // Race: pembayaran aktif lain untuk tagihan ini baru saja dibuat
+      // (unique index parsial hasil audit keamanan run-1).
+      if (e instanceof Error && "code" in e && (e as { code?: string }).code === "P2002") {
+        return NextResponse.json({ error: "PEMBAYARAN_AKTIF_SUDAH_ADA" }, { status: 409 });
+      }
+      throw e;
+    }
     await prisma.tagihanWarga.update({ where: { id: tw.id }, data: { status: "MENUNGGU_VALIDASI" } });
     // Notifikasi ke bendahara agar segera divalidasi
     const { kirimNotifikasiKeRole } = await import("@/lib/notifikasi");
@@ -150,17 +160,28 @@ export async function POST(req: NextRequest) {
     itemName: tw.tagihan.judul,
   });
 
-  const pembayaran = await prisma.pembayaran.create({
-    data: {
-      tagihanWargaId: tw.id,
-      userId: user.id,
-      metode: metode as (typeof METODE_ONLINE)[number],
-      nominal,
-      status: "PENDING",
-      midtransOrderId: orderId,
-      snapToken: snap.token,
-    },
-  });
+  let pembayaran;
+  try {
+    pembayaran = await prisma.pembayaran.create({
+      data: {
+        tagihanWargaId: tw.id,
+        userId: user.id,
+        metode: metode as (typeof METODE_ONLINE)[number],
+        nominal,
+        status: "PENDING",
+        midtransOrderId: orderId,
+        snapToken: snap.token,
+      },
+    });
+  } catch (e) {
+    // Race: pembayaran aktif lain untuk tagihan ini baru saja dibuat
+    // (unique index parsial hasil audit keamanan run-1). Client dapat
+    // mengulang request untuk memakai ulang transaksi yang menang.
+    if (e instanceof Error && "code" in e && (e as { code?: string }).code === "P2002") {
+      return NextResponse.json({ error: "PEMBAYARAN_AKTIF_SUDAH_ADA" }, { status: 409 });
+    }
+    throw e;
+  }
 
   return NextResponse.json({
     ok: true,

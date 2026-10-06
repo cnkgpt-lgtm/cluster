@@ -4,6 +4,12 @@ import { prisma } from "./db";
 
 // Data awal aplikasi (idempoten: aman dipanggil berulang).
 // Dipakai oleh `prisma db seed` dan endpoint sekali-pakai POST /api/admin/seed.
+//
+// Hasil audit keamanan run-1: cabang `update` dibuat KOSONG dengan sengaja.
+// Seed TIDAK BOLEH menimpa passwordHash/role/isActive akun yang sudah ada —
+// pemanggilan ulang sebelumnya diam-diam mengaktifkan kembali akun demo yang
+// dinonaktifkan admin dengan password publik. Akun demo hanya dibuat bila
+// belum ada.
 export async function runSeed(): Promise<string[]> {
   const log: string[] = [];
   const users = [
@@ -19,7 +25,7 @@ export async function runSeed(): Promise<string[]> {
     const passwordHash = await bcrypt.hash(u.password, 10);
     const user = await prisma.user.upsert({
       where: { email: u.email },
-      update: { passwordHash, role: u.role, isActive: true },
+      update: {}, // sengaja kosong: jangan sentuh akun yang sudah ada (audit run-1)
       create: {
         name: u.name,
         email: u.email,

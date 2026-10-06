@@ -34,9 +34,14 @@ export async function POST(req: NextRequest) {
   const cocok = await bcrypt.compare(parsed.data.saatIni, dbUser.passwordHash);
   if (!cocok) return NextResponse.json({ error: "Kata sandi saat ini salah." }, { status: 400 });
 
+  // Ganti password sekaligus menginvalidasi sesi JWT lain yang masih beredar
+  // (hasil audit keamanan run-1): naikkan sessionVersion.
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash: await bcrypt.hash(parsed.data.baru, 10) },
+    data: {
+      passwordHash: await bcrypt.hash(parsed.data.baru, 10),
+      sessionVersion: { increment: 1 },
+    },
   });
   return NextResponse.json({ ok: true });
 }

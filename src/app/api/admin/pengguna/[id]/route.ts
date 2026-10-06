@@ -26,7 +26,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "VALIDATION_ERROR" }, { status: 400 });
 
-  const user = await prisma.user.update({ where: { id }, data: parsed.data }).catch(() => null);
+  const data = parsed.data;
+  // Perubahan role/isActive menginvalidasi semua sesi JWT yang masih beredar
+  // (hasil audit keamanan run-1): naikkan sessionVersion bila salah satunya berubah.
+  const securityChanged = data.role !== undefined || data.isActive !== undefined;
+  const user = await prisma.user
+    .update({
+      where: { id },
+      data: securityChanged
+        ? { ...data, sessionVersion: { increment: 1 } }
+        : data,
+    })
+    .catch(() => null);
   if (!user) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

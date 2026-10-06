@@ -2,7 +2,22 @@ import crypto from "crypto";
 import type { StatusPembayaran } from "./pembayaran";
 
 export function isMockMode(): boolean {
-  return process.env.MOCK_PAYMENT === "true";
+  const mock = process.env.MOCK_PAYMENT === "true";
+  // Peringatan satu-kali (hasil audit keamanan run-1): mode mock di production
+  // berarti simulator pembayaran aktif untuk semua user login.
+  if (mock && !warned && isProdEnv()) {
+    warned = true;
+    console.warn(
+      "[RTKu] PERINGATAN KEAMANAN: MOCK_PAYMENT=true di production. " +
+        "Matikan (unset/false) setelah kunci Midtrans produksi tersedia.",
+    );
+  }
+  return mock;
+}
+
+let warned = false;
+function isProdEnv(): boolean {
+  return process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
 }
 
 function midtransBase(): string {
