@@ -1,1 +1,1 @@
-{"$schema":"https://openapi.vercel.sh/vercel.json","buildCommand":"prisma migrate deploy && prisma generate && next build","installCommand":"npm install"}
+{"$schema": "https://openapi.vercel.sh/vercel.json", "buildCommand": "prisma migrate resolve --rolled-back \"20261007080000_security_fixes\" || true && prisma migrate deploy && prisma generate && next build", "installCommand": "npm install"}
