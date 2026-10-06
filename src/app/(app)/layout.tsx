@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header className="sticky top-0 z-20 hidden items-center justify-end border-b border-slate-200 bg-white/85 px-6 py-3 backdrop-blur lg:flex">
           <Bell />
         </header>
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">{children}</main>
+        <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:pb-6">{children}</main>
       </div>
     </div>
   );
