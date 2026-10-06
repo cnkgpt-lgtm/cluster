@@ -11,6 +11,17 @@ export const dynamic = "force-dynamic";
 
 const METODE_ONLINE = ["QRIS", "VA_BCA", "VA_BNI", "VA_BRI", "VA_MANDIRI", "VA_PERMATA"] as const;
 
+// Error HTTP yang dilempar dari dalam transaksi (rollback otomatis).
+class HttpErr extends Error {
+  status: number;
+  code: string;
+  constructor(status: number, code: string) {
+    super(code);
+    this.status = status;
+    this.code = code;
+  }
+}
+
 const jsonSchema = z.object({
   tagihanWargaId: z.string().min(1),
   // JSON hanya untuk QRIS (otomatis). VA & transfer manual lewat FormData + bukti.
@@ -99,27 +110,43 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+    // Serialisasi check-then-act (hasil audit keamanan run-1): kunci baris
+    // tagihan (FOR UPDATE) agar dua request konkuren tidak sama-sama lolos
+    // gate dan membuat pembayaran ganda. Cek duplikat aktif dilakukan di
+    // dalam transaksi yang sama sehingga race tertutup total.
     let pembayaran;
     try {
-      pembayaran = await prisma.pembayaran.create({
-        data: {
-          tagihanWargaId: tw.id,
-          userId: user.id,
-          metode: metode as "TRANSFER_MANUAL" | "VA_BCA" | "VA_BNI" | "VA_BRI" | "VA_MANDIRI" | "VA_PERMATA",
-          nominal,
-          status: "MENUNGGU_VALIDASI",
-          buktiUrl,
-        },
+      pembayaran = await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT "id" FROM "tagihan_warga" WHERE "id" = ${tagihanWargaId} FOR UPDATE`;
+        const twTx = await tx.tagihanWarga.findUnique({ where: { id: tagihanWargaId } });
+        if (!twTx || twTx.userId !== user.id) throw new HttpErr(403, "FORBIDDEN");
+        if (twTx.status !== "BELUM_BAYAR") throw new HttpErr(400, "TAGIHAN_TIDAK_AKTIF");
+        const aktif = await tx.pembayaran.findFirst({
+          where: { tagihanWargaId, status: { in: ["PENDING", "MENUNGGU_VALIDASI"] } },
+        });
+        if (aktif) throw new HttpErr(409, "PEMBAYARAN_AKTIF_SUDAH_ADA");
+        const p = await tx.pembayaran.create({
+          data: {
+            tagihanWargaId,
+            userId: user.id,
+            metode: metode as "TRANSFER_MANUAL" | "VA_BCA" | "VA_BNI" | "VA_BRI" | "VA_MANDIRI" | "VA_PERMATA",
+            nominal: twTx.nominal,
+            status: "MENUNGGU_VALIDASI",
+            buktiUrl,
+          },
+        });
+        await tx.tagihanWarga.update({
+          where: { id: tagihanWargaId },
+          data: { status: "MENUNGGU_VALIDASI" },
+        });
+        return p;
       });
     } catch (e) {
-      // Race: pembayaran aktif lain untuk tagihan ini baru saja dibuat
-      // (unique index parsial hasil audit keamanan run-1).
-      if (e instanceof Error && "code" in e && (e as { code?: string }).code === "P2002") {
-        return NextResponse.json({ error: "PEMBAYARAN_AKTIF_SUDAH_ADA" }, { status: 409 });
+      if (e instanceof HttpErr) {
+        return NextResponse.json({ error: e.code }, { status: e.status });
       }
       throw e;
     }
-    await prisma.tagihanWarga.update({ where: { id: tw.id }, data: { status: "MENUNGGU_VALIDASI" } });
     // Notifikasi ke bendahara agar segera divalidasi
     const { kirimNotifikasiKeRole } = await import("@/lib/notifikasi");
     await kirimNotifikasiKeRole("BENDAHARA", {
@@ -133,11 +160,49 @@ export async function POST(req: NextRequest) {
 
   // ---- Online (QRIS): pakai ulang transaksi PENDING yang masih hidup ----
   // Catatan: VA kini lewat alur bukti di atas, sehingga di sini hanya QRIS.
-  const existing = await prisma.pembayaran.findFirst({
-    where: { tagihanWargaId: tw.id, status: "PENDING", midtransOrderId: { not: null } },
-    orderBy: { createdAt: "desc" },
+  // Serialisasi check-then-act (hasil audit keamanan run-1): row lock FOR UPDATE.
+  const orderId = `RTKU-${Date.now()}-${randomBytes(3).toString("hex").toUpperCase()}`;
+  const snap = await createSnapTransaction({
+    orderId,
+    grossAmount: nominal,
+    customer: { firstName: user.name, email: user.email },
+    itemName: tw.tagihan.judul,
   });
-  if (existing?.snapToken) {
+
+  let hasil: { reuse?: { id: string; midtransOrderId: string | null; snapToken: string | null }; created?: { id: string } };
+  try {
+    hasil = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "tagihan_warga" WHERE "id" = ${tagihanWargaId} FOR UPDATE`;
+      const twTx = await tx.tagihanWarga.findUnique({ where: { id: tagihanWargaId } });
+      if (!twTx || twTx.userId !== user.id) throw new HttpErr(403, "FORBIDDEN");
+      if (twTx.status !== "BELUM_BAYAR") throw new HttpErr(400, "TAGIHAN_TIDAK_AKTIF");
+      const aktif = await tx.pembayaran.findFirst({
+        where: { tagihanWargaId, status: "PENDING", midtransOrderId: { not: null } },
+        orderBy: { createdAt: "desc" },
+      });
+      if (aktif?.snapToken) return { reuse: aktif };
+      const p = await tx.pembayaran.create({
+        data: {
+          tagihanWargaId,
+          userId: user.id,
+          metode: metode as (typeof METODE_ONLINE)[number],
+          nominal: twTx.nominal,
+          status: "PENDING",
+          midtransOrderId: orderId,
+          snapToken: snap.token,
+        },
+      });
+      return { created: p };
+    });
+  } catch (e) {
+    if (e instanceof HttpErr) {
+      return NextResponse.json({ error: e.code }, { status: e.status });
+    }
+    throw e;
+  }
+
+  if (hasil.reuse) {
+    const existing = hasil.reuse;
     return NextResponse.json({
       ok: true,
       pembayaranId: existing.id,
@@ -152,36 +217,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const orderId = `RTKU-${Date.now()}-${randomBytes(3).toString("hex").toUpperCase()}`;
-  const snap = await createSnapTransaction({
-    orderId,
-    grossAmount: nominal,
-    customer: { firstName: user.name, email: user.email },
-    itemName: tw.tagihan.judul,
-  });
-
-  let pembayaran;
-  try {
-    pembayaran = await prisma.pembayaran.create({
-      data: {
-        tagihanWargaId: tw.id,
-        userId: user.id,
-        metode: metode as (typeof METODE_ONLINE)[number],
-        nominal,
-        status: "PENDING",
-        midtransOrderId: orderId,
-        snapToken: snap.token,
-      },
-    });
-  } catch (e) {
-    // Race: pembayaran aktif lain untuk tagihan ini baru saja dibuat
-    // (unique index parsial hasil audit keamanan run-1). Client dapat
-    // mengulang request untuk memakai ulang transaksi yang menang.
-    if (e instanceof Error && "code" in e && (e as { code?: string }).code === "P2002") {
-      return NextResponse.json({ error: "PEMBAYARAN_AKTIF_SUDAH_ADA" }, { status: 409 });
-    }
-    throw e;
-  }
+  const pembayaran = hasil.created!;
 
   return NextResponse.json({
     ok: true,
