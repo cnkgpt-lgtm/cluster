@@ -72,14 +72,14 @@ export default function PenggunaPage() {
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Kelola Pengguna</h1>
           <p className="text-sm text-slate-500">Setiap warga memiliki akun. Atur role: Warga, Pengurus, Bendahara, Sekretaris.</p>
         </div>
         <button onClick={() => setShowForm((s) => !s)}
-          className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">
+          className="rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800">
           {showForm ? "Tutup" : "+ Pengguna"}
         </button>
       </div>
@@ -131,7 +131,7 @@ export default function PenggunaPage() {
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200" />
             </div>
             <div className="sm:col-span-2">
-              <button disabled={saving} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60">
+              <button disabled={saving} className="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60">
                 {saving ? "Menyimpan..." : "Simpan Pengguna"}
               </button>
             </div>

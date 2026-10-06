@@ -48,7 +48,7 @@ export default function NotifikasiPage() {
   }
 
   return (
-    <div className="anim-stagger mx-auto max-w-2xl space-y-6">
+    <div className="anim-fade-up mx-auto max-w-2xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Notifikasi</h1>

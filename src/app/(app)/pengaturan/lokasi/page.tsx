@@ -51,7 +51,7 @@ export default function LokasiPage() {
       (p) => {
         setLat(p.coords.latitude);
         setLng(p.coords.longitude);
-        setPesan({ ok: true, teks: "📍 Titik diambil dari posisi Anda — geser bila perlu lalu simpan." });
+        setPesan({ ok: true, teks: "📍 Titik diambil dari posisi Anda. Geser bila perlu, lalu simpan." });
       },
       () => setPesan({ ok: false, teks: "Izin lokasi ditolak." }),
       { enableHighAccuracy: true, timeout: 15000 },
@@ -72,7 +72,7 @@ export default function LokasiPage() {
         setPesan({ ok: false, teks: "Gagal menyimpan. Periksa kembali titik & radius." });
       } else {
         setDiatur(true);
-        setPesan({ ok: true, teks: `✅ Lokasi "${d.lokasi.nama}" tersimpan — radius ${d.lokasi.radiusMeter} m.` });
+        setPesan({ ok: true, teks: `✅ Lokasi "${d.lokasi.nama}" tersimpan (radius ${d.lokasi.radiusMeter} m).` });
       }
     } catch {
       setPesan({ ok: false, teks: "Jaringan bermasalah." });
@@ -173,7 +173,7 @@ export default function LokasiPage() {
             <button
               onClick={simpan}
               disabled={menyimpan}
-              className="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-700 active:scale-95 disabled:opacity-50"
+              className="w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-95 disabled:opacity-50"
             >
               {menyimpan ? "⏳ Menyimpan…" : "💾 Simpan Lokasi"}
             </button>

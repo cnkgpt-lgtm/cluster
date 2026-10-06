@@ -106,7 +106,7 @@ export default function LaporanPage() {
             onClick={() => gantiTipe(t.id)}
             className={`flex-1 rounded-2xl px-4 py-2.5 text-sm font-bold transition ${
               tipe === t.id
-                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/25"
+                ? "bg-emerald-700 text-white shadow-md shadow-emerald-700/25"
                 : "border border-slate-200 bg-white text-slate-600 hover:border-emerald-300"
             }`}
           >
@@ -228,7 +228,7 @@ export default function LaporanPage() {
         {tipe === "bulanan" && (
           <Card title={`⚠️ Tunggakan (${data?.tunggakan.length ?? 0})`}>
             {!data?.tunggakan.length ? (
-              <p className="text-sm text-slate-400">Tidak ada tunggakan — semua sudah lunas. 🎉</p>
+              <p className="text-sm text-slate-400">Tidak ada tunggakan. Semua sudah lunas. 🎉</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[480px] text-sm">

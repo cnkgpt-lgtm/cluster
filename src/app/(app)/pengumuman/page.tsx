@@ -28,7 +28,7 @@ export default async function PengumumanPage() {
   });
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Pengumuman</h1>

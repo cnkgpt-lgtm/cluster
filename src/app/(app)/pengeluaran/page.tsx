@@ -64,7 +64,7 @@ export default async function PengeluaranPage({
   const jumlah = agg._count;
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Pengeluaran</h1>

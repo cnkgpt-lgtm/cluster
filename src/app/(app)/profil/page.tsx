@@ -25,7 +25,7 @@ export default async function ProfilPage() {
   if (!profil) redirect("/login");
 
   return (
-    <div className="anim-stagger space-y-6">
+    <div className="anim-fade-up space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Profil Saya</h1>
         <p className="text-sm text-slate-500">Lengkapi identitas Anda dan kelola kata sandi akun.</p>
