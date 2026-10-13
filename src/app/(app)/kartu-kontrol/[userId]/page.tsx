@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card, Empty, Badge } from "@/components/ui";
 import BuktiViewer from "@/components/BuktiViewer";
 import { rupiah, formatTanggalWita, formatTanggalWaktuWita, labelMetode, labelJenis } from "@/lib/format";
@@ -104,19 +105,19 @@ export default function DetailKartuKontrolPage() {
         ← Kembali ke daftar warga
       </Link>
 
-      <Card title="🗂️ Kartu Kontrol Pembayaran">
+      <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="kartu" className="h-5 w-5" /> Kartu Kontrol Pembayaran</span>}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-lg font-extrabold text-slate-800">{warga.name}</p>
             <p className="text-sm text-slate-500">
               {[alamat, warga.phone].filter(Boolean).join(" • ") || "—"}
             </p>
-            {warga.alamat && <p className="mt-1 text-xs text-slate-400">{warga.alamat}</p>}
+            {warga.alamat && <p className="mt-1 text-xs text-slate-500">{warga.alamat}</p>}
           </div>
           <div className="text-right text-sm">
             <p>
               <b className="text-emerald-700">{rupiah(ringkasan.totalTerbayar)}</b>
-              <span className="text-slate-400"> / {rupiah(ringkasan.totalNominal)}</span>
+              <span className="text-slate-500"> / {rupiah(ringkasan.totalNominal)}</span>
             </p>
             <p className="text-xs text-slate-500">total terbayar</p>
           </div>
@@ -129,7 +130,7 @@ export default function DetailKartuKontrolPage() {
       </Card>
 
       {items.length === 0 ? (
-        <Empty icon="🧾" title="Belum ada tagihan" sub="Warga ini belum memiliki tagihan." />
+        <Empty icon="iuran" title="Belum ada tagihan" sub="Warga ini belum memiliki tagihan." />
       ) : (
         <div className="space-y-3">
           {items.map((it) => (
@@ -149,13 +150,13 @@ export default function DetailKartuKontrolPage() {
 
               <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-3 text-sm">
                 <div>
-                  <p className="text-xs text-slate-400">Tanggal bayar</p>
+                  <p className="text-xs text-slate-500">Tanggal bayar</p>
                   <p className="font-semibold text-slate-700">
                     {it.pembayaran ? formatTanggalWaktuWita(it.pembayaran.tanggalBayar) : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400">Metode</p>
+                  <p className="text-xs text-slate-500">Metode</p>
                   <p className="font-semibold text-slate-700">
                     {it.pembayaran ? labelMetode(it.pembayaran.metode) : "—"}
                   </p>
@@ -163,11 +164,11 @@ export default function DetailKartuKontrolPage() {
               </div>
 
               <div className="mt-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Kolom bukti bayar</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kolom bukti bayar</p>
                 {it.pembayaran?.buktiUrl ? (
                   <BuktiViewer url={it.pembayaran.buktiUrl} pembayaranId={it.pembayaran.id} ringkas />
                 ) : (
-                  <p className="mt-1 text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-slate-500">
                     {it.pembayaran ? "Otomatis (tanpa bukti upload)" : "—"}
                   </p>
                 )}

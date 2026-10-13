@@ -124,14 +124,14 @@ export default function KasPage() {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Pemasukan" value={rp(data.totalMasuk)} icon="📥" tone="emerald" />
-            <StatCard label="Pengeluaran" value={rp(data.totalKeluar)} icon="📤" tone="red" />
-            <StatCard label="Saldo" value={rp(data.saldo)} icon="💰" tone={data.saldo >= 0 ? "sky" : "amber"} />
+            <StatCard label="Pemasukan" value={rp(data.totalMasuk)} icon="masuk" tone="emerald" />
+            <StatCard label="Pengeluaran" value={rp(data.totalKeluar)} icon="keluar" tone="red" />
+            <StatCard label="Saldo" value={rp(data.saldo)} icon="kas" tone={data.saldo >= 0 ? "sky" : "amber"} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card title={`Pemasukan (${data.daftarMasuk.length})`}>
-              {data.daftarMasuk.length === 0 ? <Empty icon="📭" title="Belum ada pemasukan" /> : (
+              {data.daftarMasuk.length === 0 ? <Empty icon="folder" title="Belum ada pemasukan" /> : (
                 <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
                   {data.daftarMasuk.map((p) => (
                     <li key={p.id} className="flex items-center justify-between py-2.5">
@@ -146,7 +146,7 @@ export default function KasPage() {
               )}
             </Card>
             <Card title={`Pengeluaran (${data.daftarKeluar.length})`}>
-              {data.daftarKeluar.length === 0 ? <Empty icon="📭" title="Belum ada pengeluaran" /> : (
+              {data.daftarKeluar.length === 0 ? <Empty icon="folder" title="Belum ada pengeluaran" /> : (
                 <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
                   {data.daftarKeluar.map((p) => (
                     <li key={p.id} className="flex items-center justify-between py-2.5">

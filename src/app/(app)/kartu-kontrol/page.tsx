@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card, Empty, Badge } from "@/components/ui";
 import { rupiah } from "@/lib/format";
 
@@ -65,7 +66,7 @@ export default function KartuKontrolPage() {
   return (
     <div className="anim-fade-up mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="text-xl font-extrabold text-slate-800">🗂️ Kartu Kontrol Pembayaran</h1>
+        <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800"><Ikon nama="kartu" className="h-6 w-6" /> Kartu Kontrol Pembayaran</h1>
         <p className="text-sm text-slate-500">
           Rekap pembayaran tiap warga: tanggal bayar & bukti bayar terekam per tagihan.
         </p>
@@ -74,7 +75,7 @@ export default function KartuKontrolPage() {
       <input
         value={cari}
         onChange={(e) => setCari(e.target.value)}
-        placeholder="🔍 Cari nama / blok / nomor rumah…"
+        placeholder="Cari nama / blok / nomor rumah…"
         className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-500"
       />
 
@@ -84,7 +85,7 @@ export default function KartuKontrolPage() {
         </Card>
       ) : tampil.length === 0 ? (
         <Empty
-          icon="👥"
+          icon="warga"
           title="Tidak ada warga"
           sub={cari ? "Tidak cocok dengan pencarian." : "Belum ada data warga."}
         />
@@ -109,7 +110,7 @@ export default function KartuKontrolPage() {
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="text-sm font-extrabold text-emerald-700">{rupiah(w.totalTerbayar)}</p>
-                    <p className="text-xs text-slate-400">dari {rupiah(w.totalNominal)}</p>
+                    <p className="text-xs text-slate-500">dari {rupiah(w.totalNominal)}</p>
                     <p className="mt-1 text-lg text-slate-300">›</p>
                   </div>
                 </div>

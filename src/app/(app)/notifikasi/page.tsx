@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card, Badge, Empty } from "@/components/ui";
 
 interface Notif {
@@ -15,11 +16,11 @@ interface Notif {
 }
 
 const TIPE_ICON: Record<string, string> = {
-  PEMBAYARAN: "💳",
-  VALIDASI: "✅",
-  PENGUMUMAN: "📢",
-  TAGIHAN: "🧾",
-  INFO: "ℹ️",
+  PEMBAYARAN: "iuran",
+  VALIDASI: "validasi",
+  PENGUMUMAN: "kabar",
+  TAGIHAN: "iuran",
+  INFO: "info",
 };
 
 export default function NotifikasiPage() {
@@ -63,20 +64,20 @@ export default function NotifikasiPage() {
         {loading ? (
           <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-16 rounded-xl" />)}</div>
         ) : items.length === 0 ? (
-          <Empty icon="🔔" title="Belum ada notifikasi" />
+          <Empty icon="notifikasi" title="Belum ada notifikasi" />
         ) : (
           <ul className="divide-y divide-slate-100">
             {items.map((n) => {
               const body = (
                 <div className={`flex gap-3 py-3.5 ${n.isRead ? "opacity-70" : ""}`}>
-                  <span className="text-2xl">{TIPE_ICON[n.tipe] ?? "ℹ️"}</span>
+                  <Ikon nama={TIPE_ICON[n.tipe] ?? "info"} className="h-6 w-6" />
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2 font-semibold text-slate-800">
                       {n.judul}
                       {!n.isRead && <Badge tone="sky">baru</Badge>}
                     </p>
                     <p className="mt-0.5 text-sm text-slate-500">{n.pesan}</p>
-                    <p className="mt-1 text-xs text-slate-400">{new Date(n.createdAt).toLocaleString("id-ID")}</p>
+                    <p className="mt-1 text-xs text-slate-500">{new Date(n.createdAt).toLocaleString("id-ID")}</p>
                   </div>
                 </div>
               );

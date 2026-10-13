@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card, Empty } from "@/components/ui";
 import { rupiah, formatTanggalWita, labelMetode, NAMA_BULAN } from "@/lib/format";
 
@@ -81,7 +82,7 @@ export default function KartuSayaPage() {
   if (!data) {
     return (
       <div className="mx-auto max-w-3xl">
-        <Empty icon="🪪" title="Kartu tidak tersedia" sub="Gagal memuat data kartu pembayaran." />
+        <Empty icon="kartu" title="Kartu tidak tersedia" sub="Gagal memuat data kartu pembayaran." />
       </div>
     );
   }
@@ -100,14 +101,14 @@ export default function KartuSayaPage() {
 
       <div className="no-print flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-800">🪪 Kartu Saya</h1>
+          <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800"><Ikon nama="kartu" className="h-6 w-6" /> Kartu Saya</h1>
           <p className="text-sm text-slate-500">Kartu tanda pembayaran iuran Anda.</p>
         </div>
         <button
           onClick={() => window.print()}
           className="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-slate-700"
         >
-          🖨️ Cetak
+          <span className="inline-flex items-center gap-2"><Ikon nama="cetak" className="h-4 w-4" /> Cetak</span>
         </button>
       </div>
 
@@ -141,15 +142,15 @@ export default function KartuSayaPage() {
         {/* Identitas */}
         <div className="grid grid-cols-3 gap-2 border-b border-sky-100 px-5 py-4 text-sm">
           <div>
-            <p className="text-xs text-slate-400">👤 NAMA</p>
+            <p className="text-xs text-slate-500">NAMA</p>
             <p className="font-bold text-slate-800">{data.warga.name}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-400">🏠 BLOK</p>
+            <p className="text-xs text-slate-500">BLOK</p>
             <p className="font-bold text-slate-800">{data.warga.blok ?? "—"}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-400">🔢 NOMOR</p>
+            <p className="text-xs text-slate-500">NOMOR</p>
             <p className="font-bold text-slate-800">{data.warga.nomorRumah ?? "—"}</p>
           </div>
         </div>
@@ -196,7 +197,7 @@ export default function KartuSayaPage() {
         {/* Tim pengelola */}
         <div className="px-5 pb-2">
           <p className="inline-block rounded-t-xl bg-blue-700 px-4 py-1 text-sm font-bold text-white">
-            👥 TIM PENGELOLA
+            TIM PENGELOLA
           </p>
           <div className="grid grid-cols-2 gap-4 rounded-b-xl rounded-tr-xl border border-sky-200 p-4 text-center text-sm">
             <div>
@@ -217,7 +218,7 @@ export default function KartuSayaPage() {
         {/* Keterangan */}
         <div className="px-5 pb-5">
           <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-slate-600">
-            <p className="font-bold text-amber-800">📢 KETERANGAN :</p>
+            <p className="font-bold text-amber-800">KETERANGAN :</p>
             <ol className="mt-1 list-decimal space-y-1 pl-4">
               <li>Pembayaran iuran dapat dilakukan via QRIS, VA bank, atau transfer manual dengan mengunggah bukti.</li>
               <li>Pembayaran selain QRIS aktif (lunas) setelah divalidasi bendahara.</li>

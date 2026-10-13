@@ -74,8 +74,8 @@ export default async function PengeluaranPage({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <StatCard label="Total Pengeluaran" value={rupiah(total)} sub={`periode ${bulan}`} icon="💸" tone="red" />
-        <StatCard label="Jumlah Transaksi" value={String(jumlah)} sub="catatan pengeluaran" icon="🧾" tone="amber" />
+        <StatCard label="Total Pengeluaran" value={rupiah(total)} sub={`periode ${bulan}`} icon="pengeluaran" tone="red" />
+        <StatCard label="Jumlah Transaksi" value={String(jumlah)} sub="catatan pengeluaran" icon="iuran" tone="amber" />
       </div>
 
       <Card title="Filter">
@@ -114,7 +114,7 @@ export default async function PengeluaranPage({
 
       <Card title={`Daftar Pengeluaran (${daftar.length})`}>
         {daftar.length === 0 ? (
-          <Empty icon="📭" title="Belum ada pengeluaran" sub="Catat pengeluaran pertama dengan tombol di atas." />
+          <Empty icon="folder" title="Belum ada pengeluaran" sub="Catat pengeluaran pertama dengan tombol di atas." />
         ) : (
           <ul className="divide-y divide-slate-100">
             {daftar.map((p) => (
@@ -127,7 +127,7 @@ export default async function PengeluaranPage({
                     <span>· oleh {p.dicatatOleh.name}</span>
                   </p>
                   {p.keterangan && (
-                    <p className="mt-0.5 truncate text-xs text-slate-400">{p.keterangan}</p>
+                    <p className="mt-0.5 truncate text-xs text-slate-500">{p.keterangan}</p>
                   )}
                 </div>
                 <div className="flex shrink-0 items-center gap-1">

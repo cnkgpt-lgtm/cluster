@@ -1,15 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card, Empty, Badge, StatCard } from "@/components/ui";
 import { rupiah, formatTanggalWaktuWita, labelMetode } from "@/lib/format";
 
 type Tipe = "harian" | "mingguan" | "bulanan";
 
 const TABS: { id: Tipe; label: string }[] = [
-  { id: "harian", label: "📅 Harian" },
-  { id: "mingguan", label: "🗓️ Mingguan" },
-  { id: "bulanan", label: "📊 Bulanan" },
+  { id: "harian", label: "Harian" },
+  { id: "mingguan", label: "Mingguan" },
+  { id: "bulanan", label: "Bulanan" },
 ];
 
 interface ItemMasuk { id: string; waktu: string; warga: string; tagihan: string; metode: string; nominal: number }
@@ -87,14 +88,14 @@ export default function LaporanPage() {
 
       <div className="no-print flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-800">📊 Laporan Keuangan</h1>
+          <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800"><Ikon nama="laporan" className="h-6 w-6" /> Laporan Keuangan</h1>
           <p className="text-sm text-slate-500">Arus kas iuran & pengeluaran RT.</p>
         </div>
         <button
           onClick={() => window.print()}
           className="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-slate-700"
         >
-          🖨️ Cetak
+          <span className="inline-flex items-center gap-2"><Ikon nama="cetak" className="h-4 w-4" /> Cetak</span>
         </button>
       </div>
 
@@ -147,13 +148,13 @@ export default function LaporanPage() {
 
         {/* Ringkasan */}
         <div className="grid grid-cols-3 gap-3">
-          <StatCard label="Pemasukan" value={rupiah(r?.pemasukan ?? 0)} sub={`${r?.jumlahPemasukan ?? 0} transaksi`} icon="💰" tone="emerald" />
-          <StatCard label="Pengeluaran" value={rupiah(r?.pengeluaran ?? 0)} sub={`${r?.jumlahPengeluaran ?? 0} transaksi`} icon="💸" tone="red" />
-          <StatCard label="Saldo" value={rupiah(r?.saldo ?? 0)} sub="masuk − keluar" icon="📊" tone="sky" />
+          <StatCard label="Pemasukan" value={rupiah(r?.pemasukan ?? 0)} sub={`${r?.jumlahPemasukan ?? 0} transaksi`} icon="kas" tone="emerald" />
+          <StatCard label="Pengeluaran" value={rupiah(r?.pengeluaran ?? 0)} sub={`${r?.jumlahPengeluaran ?? 0} transaksi`} icon="pengeluaran" tone="red" />
+          <StatCard label="Saldo" value={rupiah(r?.saldo ?? 0)} sub="masuk − keluar" icon="laporan" tone="sky" />
         </div>
 
         {/* Rincian pemasukan */}
-        <Card title={`💰 Pemasukan (${data?.pemasukan.length ?? 0})`}>
+        <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="kas" className="h-5 w-5" /> Pemasukan ({data?.pemasukan.length ?? 0})</span>}>
           {data && Object.keys(data.perMetode).length > 0 && (
             <div className="mb-3 flex flex-wrap gap-1.5">
               {Object.entries(data.perMetode).map(([m, n]) => (
@@ -162,12 +163,12 @@ export default function LaporanPage() {
             </div>
           )}
           {!data?.pemasukan.length ? (
-            <p className="text-sm text-slate-400">Tidak ada pemasukan pada periode ini.</p>
+            <p className="text-sm text-slate-500">Tidak ada pemasukan pada periode ini.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
+                  <tr className="border-b border-slate-100 text-left text-xs text-slate-500">
                     <th className="py-2 pr-2">Waktu</th>
                     <th className="py-2 pr-2">Warga</th>
                     <th className="py-2 pr-2">Tagihan</th>
@@ -192,14 +193,14 @@ export default function LaporanPage() {
         </Card>
 
         {/* Rincian pengeluaran */}
-        <Card title={`💸 Pengeluaran (${data?.pengeluaran.length ?? 0})`}>
+        <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="pengeluaran" className="h-5 w-5" /> Pengeluaran ({data?.pengeluaran.length ?? 0})</span>}>
           {!data?.pengeluaran.length ? (
-            <p className="text-sm text-slate-400">Tidak ada pengeluaran pada periode ini.</p>
+            <p className="text-sm text-slate-500">Tidak ada pengeluaran pada periode ini.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
+                  <tr className="border-b border-slate-100 text-left text-xs text-slate-500">
                     <th className="py-2 pr-2">Waktu</th>
                     <th className="py-2 pr-2">Keterangan</th>
                     <th className="py-2 pr-2">Kategori</th>
@@ -212,7 +213,7 @@ export default function LaporanPage() {
                       <td className="py-2 pr-2 text-xs text-slate-500">{formatTanggalWaktuWita(p.waktu)}</td>
                       <td className="py-2 pr-2">
                         <p className="font-semibold">{p.judul}</p>
-                        {p.keterangan && <p className="text-xs text-slate-400">{p.keterangan}</p>}
+                        {p.keterangan && <p className="text-xs text-slate-500">{p.keterangan}</p>}
                       </td>
                       <td className="py-2 pr-2"><Badge tone="amber">{p.kategori}</Badge></td>
                       <td className="py-2 text-right font-bold text-red-600">−{rupiah(p.nominal)}</td>
@@ -226,14 +227,14 @@ export default function LaporanPage() {
 
         {/* Tunggakan (bulanan) */}
         {tipe === "bulanan" && (
-          <Card title={`⚠️ Tunggakan (${data?.tunggakan.length ?? 0})`}>
+          <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="peringatan" className="h-5 w-5" /> Tunggakan ({data?.tunggakan.length ?? 0})</span>}>
             {!data?.tunggakan.length ? (
-              <p className="text-sm text-slate-400">Tidak ada tunggakan. Semua sudah lunas. 🎉</p>
+              <p className="text-sm text-slate-500">Tidak ada tunggakan. Semua sudah lunas.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[480px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
+                    <tr className="border-b border-slate-100 text-left text-xs text-slate-500">
                       <th className="py-2 pr-2">Warga</th>
                       <th className="py-2 pr-2">Tagihan</th>
                       <th className="py-2 pr-2">Status</th>
@@ -245,7 +246,7 @@ export default function LaporanPage() {
                       <tr key={i} className="border-b border-slate-50">
                         <td className="py-2 pr-2 font-semibold">
                           {t.warga}
-                          <span className="block text-xs font-normal text-slate-400">
+                          <span className="block text-xs font-normal text-slate-500">
                             {[t.blok ? `Blok ${t.blok}` : null, t.nomorRumah ? `No. ${t.nomorRumah}` : null].filter(Boolean).join(" ") || "—"}
                           </span>
                         </td>
@@ -265,7 +266,7 @@ export default function LaporanPage() {
           </Card>
         )}
 
-        {loading && !data && <Empty icon="📊" title="Memuat laporan…" sub="Mengambil data keuangan." />}
+        {loading && !data && <Empty icon="laporan" title="Memuat laporan…" sub="Mengambil data keuangan." />}
       </div>
     </div>
   );

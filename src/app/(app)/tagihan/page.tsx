@@ -135,7 +135,7 @@ export default function TagihanPage() {
         {loading ? (
           <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
         ) : items.length === 0 ? (
-          <Empty icon="🧾" title="Belum ada tagihan" sub="Buat tagihan pertama untuk warga." />
+          <Empty icon="iuran" title="Belum ada tagihan" sub="Buat tagihan pertama untuk warga." />
         ) : (
           <ul className="divide-y divide-slate-100">
             {items.map((t) => (
