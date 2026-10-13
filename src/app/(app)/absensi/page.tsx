@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Ikon from "@/components/Ikon";
+import { useEscape } from "@/components/useEscape";
 import { Card, Empty, Badge, StatCard } from "@/components/ui";
 import { formatTanggalWita, formatTanggalWaktuWita } from "@/lib/format";
 import { analisisSampelGps, type SampelGps } from "@/lib/absensi";
@@ -111,7 +113,7 @@ export default function AbsensiPage() {
     if (analisis.varianNol) {
       setPesan({
         ok: false,
-        teks: "⛔ Terdeteksi lokasi palsu (fake GPS): koordinat tidak berubah sama sekali. Matikan aplikasi fake GPS / mock location, pastikan GPS asli aktif, lalu coba lagi.",
+        teks: "Terdeteksi lokasi palsu (fake GPS): koordinat tidak berubah sama sekali. Matikan aplikasi fake GPS / mock location, pastikan GPS asli aktif, lalu coba lagi.",
       });
       return;
     }
@@ -145,6 +147,7 @@ export default function AbsensiPage() {
     setKameraBuka(null);
     setKameraError("");
   };
+  useEscape(kameraBuka !== null, tutupKamera);
 
   const kirimAbsen = async (file: File, tipe: "masuk" | "pulang") => {
     if (!pos) return;
@@ -183,8 +186,8 @@ export default function AbsensiPage() {
         setPesan({
           ok: true,
           teks: tipe === "masuk"
-            ? `✅ Absen masuk tercatat ${formatTanggalWaktuWita(d.jamMasuk)}. Selamat bertugas!`
-            : `✅ Absen pulang tercatat ${formatTanggalWaktuWita(d.jamPulang)}. Terima kasih!`,
+            ? `Absen masuk tercatat ${formatTanggalWaktuWita(d.jamMasuk)}. Selamat bertugas!`
+            : `Absen pulang tercatat ${formatTanggalWaktuWita(d.jamPulang)}. Terima kasih!`,
         });
         tutupKamera();
         muat();
@@ -228,7 +231,7 @@ export default function AbsensiPage() {
   return (
     <div className="anim-fade-up mx-auto max-w-2xl space-y-4">
       <div>
-        <h1 className="text-xl font-extrabold text-slate-800">🛡️ Absensi Security</h1>
+        <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800"><Ikon nama="absensi" className="h-6 w-6" /> Absensi Security</h1>
         <p className="text-sm text-slate-500">Selfie wajah + GPS area perumahan.</p>
       </div>
 
@@ -239,14 +242,14 @@ export default function AbsensiPage() {
       )}
 
       {!lokasiDiatur && (
-        <Card title="⚠️ Lokasi Belum Diatur">
+        <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="peringatan" className="h-5 w-5" /> Lokasi Belum Diatur</span>}>
           <p className="text-sm text-slate-600">Titik lokasi perumahan belum diatur oleh pengurus. Absensi belum bisa digunakan.</p>
         </Card>
       )}
 
       {/* Status GPS */}
-      <Card title="📍 Posisi Saya">
-        <p className="mb-2 text-xs text-slate-400">🛡️ Anti fake GPS aktif — keaslian lokasi diverifikasi tiap absen.</p>
+      <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="lokasi" className="h-5 w-5" /> Posisi Saya</span>}>
+        <p className="mb-2 text-xs text-slate-500">Anti fake GPS aktif, keaslian lokasi diverifikasi tiap absen.</p>
         {gpsError ? (
           <p className="text-sm font-semibold text-red-600">{gpsError}</p>
         ) : !pos ? (
@@ -255,7 +258,7 @@ export default function AbsensiPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className={`text-sm font-bold ${diDalam ? "text-emerald-700" : "text-red-600"}`}>
-                {diDalam ? "✅ Dalam area perumahan" : "⚠️ Di luar area perumahan"}
+                {diDalam ? "Dalam area perumahan" : "Di luar area perumahan"}
               </p>
               <p className="text-xs text-slate-500">
                 Jarak {jarak} m dari titik (maks {lokasi?.radiusMeter} m) · akurasi ±{pos.akurasi} m
@@ -268,8 +271,8 @@ export default function AbsensiPage() {
 
       {/* Status hari ini */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard label="Jam Masuk" value={hariIni?.jamMasuk ? formatTanggalWaktuWita(hariIni.jamMasuk).split(", ")[1] ?? "—" : "—"} sub="hari ini" icon="🟢" tone="emerald" />
-        <StatCard label="Jam Pulang" value={hariIni?.jamPulang ? formatTanggalWaktuWita(hariIni.jamPulang).split(", ")[1] ?? "—" : "—"} sub="hari ini" icon="🔴" tone="sky" />
+        <StatCard label="Jam Masuk" value={hariIni?.jamMasuk ? formatTanggalWaktuWita(hariIni.jamMasuk).split(", ")[1] ?? "—" : "—"} sub="hari ini" icon="masuk" tone="emerald" />
+        <StatCard label="Jam Pulang" value={hariIni?.jamPulang ? formatTanggalWaktuWita(hariIni.jamPulang).split(", ")[1] ?? "—" : "—"} sub="hari ini" icon="keluar" tone="sky" />
       </div>
 
       {/* Tombol absen */}
@@ -284,30 +287,28 @@ export default function AbsensiPage() {
           disabled={sudahMasuk || !!verifikasi}
           className={`rounded-2xl px-4 py-4 text-sm font-extrabold shadow-md transition active:scale-95 disabled:opacity-40 ${
             sudahMasuk ? "bg-slate-200 text-slate-500" : "bg-emerald-700 text-white shadow-emerald-700/25 hover:bg-emerald-800"
-          }`}
-        >
-          📸 Absen Masuk
+          } inline-flex items-center justify-center gap-2`}>
+          <Ikon nama="kamera" className="h-5 w-5" /> Absen Masuk
         </button>
         <button
           onClick={() => bukaKamera("pulang")}
           disabled={!sudahMasuk || sudahPulang || !!verifikasi}
           className={`rounded-2xl px-4 py-4 text-sm font-extrabold shadow-md transition active:scale-95 disabled:opacity-40 ${
             sudahMasuk && !sudahPulang ? "bg-sky-700 text-white shadow-sky-700/25 hover:bg-sky-800" : "bg-slate-200 text-slate-500"
-          }`}
-        >
-          📸 Absen Pulang
+          } inline-flex items-center justify-center gap-2`}>
+          <Ikon nama="kamera" className="h-5 w-5" /> Absen Pulang
         </button>
       </div>
       {sudahPulang && (
-        <p className="text-center text-sm font-semibold text-emerald-700">Shift hari ini selesai. Terima kasih! 🙏</p>
+        <p className="text-center text-sm font-semibold text-emerald-700">Shift hari ini selesai. Terima kasih!</p>
       )}
 
       {/* Riwayat */}
-      <Card title="🗓️ Riwayat Absensi">
+      <Card title={<span className="inline-flex items-center gap-2"><Ikon nama="kalender" className="h-5 w-5" /> Riwayat Absensi</span>}>
         {loading ? (
-          <p className="text-sm text-slate-400">Memuat…</p>
+          <p className="text-sm text-slate-500">Memuat…</p>
         ) : riwayat.length === 0 ? (
-          <Empty icon="🛡️" title="Belum ada riwayat" sub="Absensi Anda akan tercatat di sini." />
+          <Empty icon="absensi" title="Belum ada riwayat" sub="Absensi Anda akan tercatat di sini." />
         ) : (
           <ul className="divide-y divide-slate-100">
             {riwayat.map((r) => (
@@ -334,16 +335,16 @@ export default function AbsensiPage() {
           <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-slate-100 p-4">
               <p className="font-extrabold text-slate-800">
-                {kameraBuka === "masuk" ? "📸 Selfie Absen Masuk" : "📸 Selfie Absen Pulang"}
+                {kameraBuka === "masuk" ? "Selfie Absen Masuk" : "Selfie Absen Pulang"}
               </p>
-              <button onClick={tutupKamera} className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold">✕</button>
+              <button onClick={tutupKamera} className="rounded-full bg-slate-100 p-2 text-sm font-bold" aria-label="Tutup kamera"><Ikon nama="silang" className="h-4 w-4" /></button>
             </div>
             <div className="p-4">
               {kameraError ? (
                 <div className="space-y-3 text-center">
                   <p className="text-sm text-red-600">{kameraError}</p>
                   <label className="block cursor-pointer rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white">
-                    📤 Upload Foto Selfie
+                    <span className="inline-flex items-center justify-center gap-2"><Ikon nama="unggah" className="h-5 w-5" /> Upload Foto Selfie</span>
                     <input
                       ref={fileRef}
                       type="file"
@@ -365,7 +366,7 @@ export default function AbsensiPage() {
                     disabled={mengirim}
                     className="mt-4 w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white shadow-md transition active:scale-95 disabled:opacity-50"
                   >
-                    {mengirim ? "⏳ Mengirim…" : "📸 Ambil & Kirim"}
+                    {mengirim ? "Mengirim…" : <span className="inline-flex items-center justify-center gap-2"><Ikon nama="kamera" className="h-5 w-5" /> Ambil & Kirim</span>}
                   </button>
                 </>
               )}

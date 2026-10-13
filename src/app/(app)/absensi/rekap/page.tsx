@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Ikon from "@/components/Ikon";
+import { useEscape } from "@/components/useEscape";
 import { Card, Empty, Badge } from "@/components/ui";
 import { formatTanggalWaktuWita } from "@/lib/format";
 
@@ -30,6 +32,7 @@ function hariIni(): string {
 
 function SelfieViewer({ src, label }: { src: string; label: string }) {
   const [buka, setBuka] = useState(false);
+  useEscape(buka, () => setBuka(false));
   return (
     <div>
       <p className="mb-1 text-xs font-bold text-slate-500">{label}</p>
@@ -92,7 +95,7 @@ export default function RekapAbsensiPage() {
   return (
     <div className="anim-fade-up mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="text-xl font-extrabold text-slate-800">🛡️ Rekap Absensi Security</h1>
+        <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800"><Ikon nama="absensi" className="h-6 w-6" /> Rekap Absensi Security</h1>
         <p className="text-sm text-slate-500">{hadir} dari {items.length} security hadir.</p>
       </div>
 
@@ -109,9 +112,9 @@ export default function RekapAbsensiPage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-slate-400">Memuat…</p>
+        <p className="text-sm text-slate-500">Memuat…</p>
       ) : items.length === 0 ? (
-        <Empty icon="🛡️" title="Belum ada akun security" sub="Tambahkan akun dengan role Security di menu Pengguna." />
+        <Empty icon="absensi" title="Belum ada akun security" sub="Tambahkan akun dengan role Security di menu Pengguna." />
       ) : (
         <div className="space-y-3">
           {items.map((i) => (
@@ -119,13 +122,13 @@ export default function RekapAbsensiPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex gap-6">
                   <div>
-                    <p className="text-xs text-slate-400">Jam masuk</p>
+                    <p className="text-xs text-slate-500">Jam masuk</p>
                     <p className="font-extrabold text-emerald-700">
                       {i.jamMasuk ? formatTanggalWaktuWita(i.jamMasuk).split(", ")[1] : "—"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-400">Jam pulang</p>
+                    <p className="text-xs text-slate-500">Jam pulang</p>
                     <p className="font-extrabold text-sky-700">
                       {i.jamPulang ? formatTanggalWaktuWita(i.jamPulang).split(", ")[1] : "—"}
                     </p>
@@ -134,15 +137,15 @@ export default function RekapAbsensiPage() {
                 <div className="flex flex-col items-end gap-1.5">
                   <Badge tone={badge[i.status].tone}>{badge[i.status].teks}</Badge>
                   {i.mencurigakan && (
-                    <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700" title={i.alasanCuriga ?? ""}>
-                      ⚠️ Mencurigakan
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700" title={i.alasanCuriga ?? ""}>
+                      <Ikon nama="peringatan" className="h-3.5 w-3.5" /> Mencurigakan
                     </span>
                   )}
                 </div>
               </div>
               {i.mencurigakan && i.alasanCuriga && (
                 <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
-                  ⚠️ {i.alasanCuriga} — mohon ditinjau.
+                  {i.alasanCuriga}, mohon ditinjau.
                 </p>
               )}
               {i.absensiId && (i.adaFotoMasuk || i.adaFotoPulang) && (

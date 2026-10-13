@@ -25,14 +25,14 @@ export default async function CctvPage() {
 
       {kamera.length === 0 ? (
         <Card title="Kamera">
-          <Empty icon="📹" title="Belum ada kamera aktif" sub="Pengurus dapat menambahkan kamera di bawah." />
+          <Empty icon="cctv" title="Belum ada kamera aktif" sub="Pengurus dapat menambahkan kamera di bawah." />
         </Card>
       ) : (
         <div className="grid gap-5 md:grid-cols-2">
           {kamera.map((k) => (
             <div key={k.id}>
               <CctvPlayer src={k.streamUrl} nama={k.nama} />
-              {k.lokasi && <p className="mt-1.5 text-xs text-slate-500">📍 {k.lokasi}</p>}
+              {k.lokasi && <p className="mt-1.5 text-xs text-slate-500">{k.lokasi}</p>}
             </div>
           ))}
         </div>

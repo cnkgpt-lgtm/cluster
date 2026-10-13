@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { rupiah, formatTanggalWita, formatTanggalWaktuWita } from "@/lib/format";
 import { StatCard, Card, badgeStatusBayar, Empty } from "@/components/ui";
+import Ikon from "@/components/Ikon";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
       <div className="anim-fade-up space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-            Halo, {user.name?.split(" ")[0]} 👋
+            Halo, {user.name?.split(" ")[0]}
           </h1>
           <p className="text-sm text-slate-500">Ringkasan iuran dan informasi perumahan Anda.</p>
         </div>
@@ -58,7 +59,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-            <p className="text-3xl">🎉</p>
+            <Ikon nama="cek" className="h-8 w-8 text-emerald-600" />
             <p className="mt-2 font-bold text-slate-900">Semua tagihan lunas</p>
             <p className="text-sm text-slate-500">Tidak ada tagihan yang perlu dibayar.</p>
           </div>
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
           action={<Link href="/pengumuman" className="text-sm font-semibold text-emerald-700 hover:underline">Lihat semua →</Link>}
         >
           {pengumuman.length === 0 ? (
-            <Empty icon="📭" title="Belum ada pengumuman" />
+            <Empty icon="kabar" title="Belum ada pengumuman" />
           ) : (
             <ul className="space-y-3">
               {pengumuman.map((p) => (
@@ -124,7 +125,7 @@ export default async function DashboardPage() {
       <div className="anim-fade-up space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-            Halo, {user.name?.split(" ")[0]} 🛡️
+            Halo, {user.name?.split(" ")[0]}
           </h1>
           <p className="text-sm text-slate-500">Shift jaga hari ini.</p>
         </div>
@@ -134,14 +135,14 @@ export default async function DashboardPage() {
             label="Jam Masuk"
             value={hariIni?.jamMasuk ? formatTanggalWaktuWita(hariIni.jamMasuk).split(", ")[1] ?? "—" : "Belum absen"}
             sub="hari ini"
-            icon="🟢"
+            icon="masuk"
             tone="emerald"
           />
           <StatCard
             label="Jam Pulang"
             value={hariIni?.jamPulang ? formatTanggalWaktuWita(hariIni.jamPulang).split(", ")[1] ?? "—" : "—"}
             sub="hari ini"
-            icon="🔴"
+            icon="keluar"
             tone="sky"
           />
         </div>
@@ -154,7 +155,7 @@ export default async function DashboardPage() {
             {!hariIni?.jamMasuk
               ? "Anda belum absen masuk hari ini. Ketuk tombol Absen Masuk dengan selfie wajah di area perumahan."
               : hariIni.jamPulang
-                ? "Shift hari ini selesai. Terima kasih! 🙏"
+                ? "Shift hari ini selesai. Terima kasih!"
                 : "Anda sedang bertugas. Jangan lupa absen pulang saat shift berakhir."}
           </p>
         </Card>
@@ -164,7 +165,7 @@ export default async function DashboardPage() {
           action={<Link href="/pengumuman" className="text-sm font-semibold text-emerald-700 hover:underline">Lihat semua →</Link>}
         >
           {pengumuman.length === 0 ? (
-            <Empty icon="📭" title="Belum ada pengumuman" />
+            <Empty icon="kabar" title="Belum ada pengumuman" />
           ) : (
             <ul className="space-y-3">
               {pengumuman.map((p) => (
@@ -231,15 +232,15 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
-          <p className="font-bold text-slate-900">✅ Tidak ada antrean validasi</p>
+          <p className="font-bold text-slate-900">Tidak ada antrean validasi</p>
           <p className="text-sm text-slate-500">Semua pembayaran warga sudah diproses.</p>
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-        <StatCard label="Kas Masuk Bulan Ini" value={rupiah(kasMasuk._sum.nominal ?? 0)} icon="💰" tone="emerald" />
-        <StatCard label="Pengeluaran Bulan Ini" value={rupiah(pengeluaran._sum.nominal ?? 0)} icon="🧾" tone="red" />
-        <StatCard label="Total Warga Aktif" value={String(totalWarga)} sub={`${tagihanAktif} tagihan belum bayar`} icon="👥" tone="sky" />
+        <StatCard label="Kas Masuk Bulan Ini" value={rupiah(kasMasuk._sum.nominal ?? 0)} icon="kas" tone="emerald" />
+        <StatCard label="Pengeluaran Bulan Ini" value={rupiah(pengeluaran._sum.nominal ?? 0)} icon="iuran" tone="red" />
+        <StatCard label="Total Warga Aktif" value={String(totalWarga)} sub={`${tagihanAktif} tagihan belum bayar`} icon="warga" tone="sky" />
       </div>
 
       <Card
@@ -247,7 +248,7 @@ export default async function DashboardPage() {
         action={<Link href="/validasi" className="text-sm font-semibold text-emerald-700 hover:underline">Validasi →</Link>}
       >
         {pembayaranTerbaru.length === 0 ? (
-          <Empty icon="📭" title="Belum ada pembayaran" />
+          <Empty icon="folder" title="Belum ada pembayaran" />
         ) : (
           <ul className="divide-y divide-slate-100">
             {pembayaranTerbaru.map((p) => (

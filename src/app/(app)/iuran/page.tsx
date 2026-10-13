@@ -31,7 +31,7 @@ export default async function IuranPage() {
 
       <Card title={`Perlu Dibayar (${belumBayar.length})`}>
         {belumBayar.length === 0 ? (
-          <Empty icon="🎉" title="Tidak ada tagihan aktif" sub="Semua iuran Anda sudah lunas." />
+          <Empty icon="cek" title="Tidak ada tagihan aktif" sub="Semua iuran Anda sudah lunas." />
         ) : (
           <ul className="divide-y divide-slate-100">
             {belumBayar.map((t) => (
@@ -86,7 +86,7 @@ export default async function IuranPage() {
 
       <Card title="Riwayat">
         {riwayat.length === 0 ? (
-          <Empty icon="📭" title="Belum ada riwayat" />
+          <Empty icon="folder" title="Belum ada riwayat" />
         ) : (
           <ul className="divide-y divide-slate-100">
             {riwayat.map((t) => (

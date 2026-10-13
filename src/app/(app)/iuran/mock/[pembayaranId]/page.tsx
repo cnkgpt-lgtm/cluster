@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card } from "@/components/ui";
 
 // Halaman simulasi pembayaran QRIS — hanya dipakai saat MOCK_PAYMENT=true.
@@ -36,8 +37,8 @@ export default function MockBayarPage() {
     <div className="anim-fade-up mx-auto max-w-md space-y-6">
       <Card title="Simulasi Pembayaran QRIS (Mode Mock)">
         <div className="flex flex-col items-center py-4">
-          <div className="grid h-40 w-40 place-items-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-5xl">
-            📱
+          <div className="grid h-40 w-40 place-items-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50">
+            <Ikon nama="hp" className="h-16 w-16 text-slate-500" />
           </div>
           <p className="mt-3 text-center text-sm text-slate-500">
             Mode mock aktif. Tidak ada kunci Midtrans. QRIS otomatis lunas
@@ -53,14 +54,14 @@ export default function MockBayarPage() {
             disabled={!!loading}
             className="w-full rounded-xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60"
           >
-            {loading === "PAID" ? "Memproses..." : "✅ Simulasikan Berhasil (Lunas)"}
+            {loading === "PAID" ? "Memproses..." : "Simulasikan Berhasil (Lunas)"}
           </button>
           <button
             onClick={() => simulasi("FAILED")}
             disabled={!!loading}
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
           >
-            ❌ Simulasikan Gagal
+            Simulasikan Gagal
           </button>
           <button
             onClick={() => simulasi("EXPIRED")}
