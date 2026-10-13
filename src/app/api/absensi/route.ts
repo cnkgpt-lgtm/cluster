@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { simpanBukti } from "@/lib/r2";
-import { awalHariWita, dalamRadius } from "@/lib/absensi";
+import { awalHariWita, dalamRadius, kecepatanKmh } from "@/lib/absensi";
 import { formatTanggalWaktuWita } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +45,8 @@ export async function GET(req: NextRequest) {
           absensiId: a?.id ?? null,
           adaFotoMasuk: !!a?.fotoMasuk,
           adaFotoPulang: !!a?.fotoPulang,
+          mencurigakan: a?.mencurigakan ?? false,
+          alasanCuriga: a?.alasanCuriga ?? null,
           status: !a?.jamMasuk ? "BELUM_ABSEN" : a.jamPulang ? "SELESAI" : "BERTUGAS",
         };
       }),
@@ -98,6 +100,10 @@ export async function POST(req: NextRequest) {
   const foto = form.get("foto");
   const lat = Number(form.get("lat"));
   const lng = Number(form.get("lng"));
+  // Data verifikasi anti fake GPS dari client
+  const akurasi = Number(form.get("akurasi"));
+  const waktuGps = new Date(String(form.get("waktuGps") ?? ""));
+  const varianNol = String(form.get("varianNol")) === "true";
 
   if (!(foto instanceof File) || foto.size === 0) {
     return NextResponse.json({ error: "SELFIE_WAJIB" }, { status: 400 });
@@ -118,6 +124,20 @@ export async function POST(req: NextRequest) {
   const tanggal = awalHariWita();
   const sekarang = new Date();
   const kunci = { userId_tanggal: { userId: me.id, tanggal } };
+
+  // Anti fake GPS (server): tolak koordinat basi — cegah replay koordinat lama.
+  const umurGpsMs = sekarang.getTime() - waktuGps.getTime();
+  if (!Number.isFinite(umurGpsMs) || umurGpsMs < 0 || umurGpsMs > 5 * 60_000) {
+    return NextResponse.json({ error: "GPS_KADALUARSA" }, { status: 400 });
+  }
+
+  // Kumpulkan alasan kecurigaan (ditampilkan di rekap untuk ditinjau pengurus).
+  const alasan: string[] = [];
+  if (varianNol) alasan.push("Dugaan fake GPS (lokasi tidak berubah)");
+  if (Number.isFinite(akurasi) && akurasi > 500) {
+    alasan.push(`Akurasi GPS buruk (±${Math.round(akurasi)} m)`);
+  }
+  const akurasiDb = Number.isFinite(akurasi) ? akurasi : null;
 
   // Cek status dulu SEBELUM upload — jangan buang upload bila sudah absen.
   const ada = await prisma.absensi.findUnique({ where: kunci });
@@ -170,13 +190,22 @@ export async function POST(req: NextRequest) {
   }
 
   if (tipe === "masuk") {
+    const flagMasuk = {
+      akurasiMasuk: akurasiDb,
+      mencurigakan: alasan.length > 0,
+      alasanCuriga: alasan.join("; ") || null,
+    };
     const a = await prisma.absensi.upsert({
       where: kunci,
       create: {
         userId: me.id, tanggal, jamMasuk: sekarang,
         fotoMasuk: refFoto, latMasuk: lat, lngMasuk: lng,
+        ...flagMasuk,
       },
-      update: { jamMasuk: sekarang, fotoMasuk: refFoto, latMasuk: lat, lngMasuk: lng },
+      update: {
+        jamMasuk: sekarang, fotoMasuk: refFoto, latMasuk: lat, lngMasuk: lng,
+        ...flagMasuk,
+      },
     });
     return NextResponse.json({
       ok: true, tipe,
@@ -186,9 +215,24 @@ export async function POST(req: NextRequest) {
 
   // pulang (status sudah dicek di atas sebelum upload; target bisa record
   // hari sebelumnya bila shift melewati tengah malam)
+  // Anti fake GPS (server): perpindahan mustahil antara masuk & pulang.
+  if (
+    target?.jamMasuk && target.latMasuk != null && target.lngMasuk != null
+  ) {
+    const kec = kecepatanKmh(target.latMasuk, target.lngMasuk, target.jamMasuk, lat, lng, sekarang);
+    if (kec != null && kec > 300) {
+      alasan.push(`Perpindahan tak wajar (${Math.round(kec)} km/jam)`);
+    }
+  }
+  const alasanGabung = [target?.alasanCuriga, ...alasan].filter(Boolean).join("; ") || null;
   const a = await prisma.absensi.update({
     where: { id: target!.id },
-    data: { jamPulang: sekarang, fotoPulang: refFoto, latPulang: lat, lngPulang: lng },
+    data: {
+      jamPulang: sekarang, fotoPulang: refFoto, latPulang: lat, lngPulang: lng,
+      akurasiPulang: akurasiDb,
+      mencurigakan: !!alasanGabung,
+      alasanCuriga: alasanGabung,
+    },
   });
   return NextResponse.json({
     ok: true, tipe,

@@ -12,6 +12,8 @@ interface Item {
   absensiId: string | null;
   adaFotoMasuk: boolean;
   adaFotoPulang: boolean;
+  mencurigakan: boolean;
+  alasanCuriga: string | null;
   status: "BELUM_ABSEN" | "BERTUGAS" | "SELESAI";
 }
 
@@ -129,8 +131,20 @@ export default function RekapAbsensiPage() {
                     </p>
                   </div>
                 </div>
-                <Badge tone={badge[i.status].tone}>{badge[i.status].teks}</Badge>
+                <div className="flex flex-col items-end gap-1.5">
+                  <Badge tone={badge[i.status].tone}>{badge[i.status].teks}</Badge>
+                  {i.mencurigakan && (
+                    <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700" title={i.alasanCuriga ?? ""}>
+                      ⚠️ Mencurigakan
+                    </span>
+                  )}
+                </div>
               </div>
+              {i.mencurigakan && i.alasanCuriga && (
+                <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                  ⚠️ {i.alasanCuriga} — mohon ditinjau.
+                </p>
+              )}
               {i.absensiId && (i.adaFotoMasuk || i.adaFotoPulang) && (
                 <div className="mt-3 flex flex-wrap gap-4 border-t border-slate-100 pt-3">
                   {i.adaFotoMasuk && (

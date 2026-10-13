@@ -37,3 +37,51 @@ export function dalamRadius(
   const jarak = jarakMeter(lat, lng, pusatLat, pusatLng);
   return { diDalam: jarak <= radiusMeter, jarak: Math.round(jarak) };
 }
+
+export interface SampelGps {
+  lat: number;
+  lng: number;
+  akurasi: number; // meter
+  waktu: number; // epoch ms
+}
+
+const SAMPEL_MINIMAL = 4;
+
+/**
+ * Analisis anti fake GPS dari beberapa sampel.
+ * GPS asli selalu bergoyang (jitter) walau perangkat diam; aplikasi fake GPS
+ * umumnya mengembalikan koordinat yang PERSIS sama setiap saat.
+ * Mengembalikan { varianNol } — true bila semua sampel identik total.
+ */
+export function analisisSampelGps(sampel: SampelGps[]): {
+  cukup: boolean;
+  varianNol: boolean;
+  akurasiRata: number | null;
+  jumlah: number;
+} {
+  const jumlah = sampel.length;
+  if (jumlah < SAMPEL_MINIMAL) {
+    return { cukup: false, varianNol: false, akurasiRata: null, jumlah };
+  }
+  const latUnik = new Set(sampel.map((s) => s.lat.toFixed(7))).size;
+  const lngUnik = new Set(sampel.map((s) => s.lng.toFixed(7))).size;
+  const akurasiRata = Math.round(
+    sampel.reduce((a, s) => a + (Number.isFinite(s.akurasi) ? s.akurasi : 9999), 0) / jumlah,
+  );
+  return {
+    cukup: true,
+    varianNol: latUnik === 1 && lngUnik === 1,
+    akurasiRata,
+    jumlah,
+  };
+}
+
+/** Kecepatan (km/jam) antara dua titik berwaktu; null bila tak bisa dihitung. */
+export function kecepatanKmh(
+  lat1: number, lng1: number, t1: Date,
+  lat2: number, lng2: number, t2: Date,
+): number | null {
+  const dtJam = Math.abs(t2.getTime() - t1.getTime()) / 3_600_000;
+  if (dtJam <= 0) return null;
+  return jarakMeter(lat1, lng1, lat2, lng2) / 1000 / dtJam;
+}

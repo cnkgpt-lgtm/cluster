@@ -241,6 +241,10 @@ model Absensi {
   lngMasuk   Float?
   latPulang  Float?
   lngPulang  Float?
+  akurasiMasuk  Float?   // akurasi GPS (meter) saat absen masuk
+  akurasiPulang Float?   // akurasi GPS (meter) saat absen pulang
+  mencurigakan  Boolean @default(false) // dugaan fake GPS / perpindahan tak wajar
+  alasanCuriga  String?  // alasan penandaan, untuk ditinjau pengurus
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 

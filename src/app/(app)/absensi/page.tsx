@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, Empty, Badge, StatCard } from "@/components/ui";
 import { formatTanggalWita, formatTanggalWaktuWita } from "@/lib/format";
+import { analisisSampelGps, type SampelGps } from "@/lib/absensi";
 
 interface Lokasi { nama: string; latitude: number; longitude: number; radiusMeter: number }
 interface HariIni { jamMasuk: string | null; jamPulang: string | null }
@@ -29,10 +30,14 @@ export default function AbsensiPage() {
   const [kameraBuka, setKameraBuka] = useState<"masuk" | "pulang" | null>(null);
   const [kameraError, setKameraError] = useState("");
   const [mengirim, setMengirim] = useState(false);
+  const [verifikasi, setVerifikasi] = useState("");
   const [pesan, setPesan] = useState<{ ok: boolean; teks: string } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Buffer sampel GPS untuk deteksi fake GPS (diisi oleh watchPosition)
+  const sampelRef = useRef<SampelGps[]>([]);
+  const hasilVerifikasiRef = useRef<{ varianNol: boolean; akurasi: number; waktuGps: string; jumlah: number } | null>(null);
 
   const muat = useCallback(() => {
     setLoading(true);
@@ -58,8 +63,20 @@ export default function AbsensiPage() {
     }
     const id = navigator.geolocation.watchPosition(
       (p) => {
-        setPos({ lat: p.coords.latitude, lng: p.coords.longitude, akurasi: Math.round(p.coords.accuracy ?? 0) });
+        const s: SampelGps = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude,
+          akurasi: Math.round(p.coords.accuracy ?? 0),
+          waktu: p.timestamp,
+        };
+        setPos({ lat: s.lat, lng: s.lng, akurasi: s.akurasi });
         setGpsError("");
+        // Kumpulkan sampel (maks 6, tiap sampel ≥1,5 dtk) untuk uji fake GPS
+        const buf = sampelRef.current;
+        if (buf.length === 0 || s.waktu - buf[buf.length - 1].waktu >= 1500) {
+          buf.push(s);
+          if (buf.length > 6) buf.shift();
+        }
       },
       () => setGpsError("Izin lokasi ditolak. Aktifkan GPS dan izinkan akses lokasi."),
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 },
@@ -70,12 +87,42 @@ export default function AbsensiPage() {
   const jarak = lokasi && pos ? Math.round(jarakMeter(pos.lat, pos.lng, lokasi.latitude, lokasi.longitude)) : null;
   const diDalam = jarak !== null && lokasi ? jarak <= lokasi.radiusMeter : false;
 
-  // Kamera
+  // Kamera — dengan verifikasi anti fake GPS sebelum dibuka
   const bukaKamera = async (tipe: "masuk" | "pulang") => {
     setPesan(null);
     setKameraError("");
     if (!pos) { setPesan({ ok: false, teks: "Tunggu lokasi GPS terkunci dulu." }); return; }
     if (!diDalam) { setPesan({ ok: false, teks: `Anda di luar area (${jarak} m dari titik, maks ${lokasi?.radiusMeter} m).` }); return; }
+
+    // Kumpulkan minimal 4 sampel GPS (GPS asli bergoyang, fake GPS diam persis)
+    setVerifikasi("Memverifikasi keaslian lokasi…");
+    const batas = Date.now() + 12000;
+    let analisis = analisisSampelGps(sampelRef.current);
+    while (!analisis.cukup && Date.now() < batas) {
+      setVerifikasi(`Memverifikasi keaslian lokasi… (${analisis.jumlah}/4)`);
+      await new Promise((r) => setTimeout(r, 500));
+      analisis = analisisSampelGps(sampelRef.current);
+    }
+    setVerifikasi("");
+    if (!analisis.cukup) {
+      setPesan({ ok: false, teks: "Sinyal GPS belum stabil. Tunggu sebentar lalu coba lagi." });
+      return;
+    }
+    if (analisis.varianNol) {
+      setPesan({
+        ok: false,
+        teks: "⛔ Terdeteksi lokasi palsu (fake GPS): koordinat tidak berubah sama sekali. Matikan aplikasi fake GPS / mock location, pastikan GPS asli aktif, lalu coba lagi.",
+      });
+      return;
+    }
+    const terakhir = sampelRef.current[sampelRef.current.length - 1];
+    hasilVerifikasiRef.current = {
+      varianNol: analisis.varianNol,
+      akurasi: terakhir.akurasi,
+      waktuGps: new Date(terakhir.waktu).toISOString(),
+      jumlah: analisis.jumlah,
+    };
+
     setKameraBuka(tipe);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -101,6 +148,11 @@ export default function AbsensiPage() {
 
   const kirimAbsen = async (file: File, tipe: "masuk" | "pulang") => {
     if (!pos) return;
+    const ver = hasilVerifikasiRef.current;
+    if (!ver) {
+      setPesan({ ok: false, teks: "Verifikasi lokasi belum dilakukan. Tutup lalu coba lagi." });
+      return;
+    }
     setMengirim(true);
     setPesan(null);
     try {
@@ -109,6 +161,10 @@ export default function AbsensiPage() {
       fd.append("foto", file, "selfie.jpg");
       fd.append("lat", String(pos.lat));
       fd.append("lng", String(pos.lng));
+      fd.append("akurasi", String(ver.akurasi));
+      fd.append("waktuGps", ver.waktuGps);
+      fd.append("varianNol", ver.varianNol ? "true" : "false");
+      fd.append("jumlahSampel", String(ver.jumlah));
       const r = await fetch("/api/absensi", { method: "POST", body: fd });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -119,6 +175,7 @@ export default function AbsensiPage() {
           SUDAH_ABSEN_PULANG: `Sudah absen pulang (${d.jamPulang ?? ""}).`,
           BELUM_ABSEN_MASUK: "Absen masuk dulu sebelum absen pulang.",
           LOKASI_BELUM_DIATUR: "Titik lokasi belum diatur pengurus.",
+          GPS_KADALUARSA: "Data lokasi kedaluwarsa. Coba lagi.",
           UPLOAD_GAGAL: "Upload selfie gagal, coba lagi.",
         };
         setPesan({ ok: false, teks: petaPesan[d.error as string] ?? "Gagal menyimpan absensi." });
@@ -189,6 +246,7 @@ export default function AbsensiPage() {
 
       {/* Status GPS */}
       <Card title="📍 Posisi Saya">
+        <p className="mb-2 text-xs text-slate-400">🛡️ Anti fake GPS aktif — keaslian lokasi diverifikasi tiap absen.</p>
         {gpsError ? (
           <p className="text-sm font-semibold text-red-600">{gpsError}</p>
         ) : !pos ? (
@@ -215,10 +273,15 @@ export default function AbsensiPage() {
       </div>
 
       {/* Tombol absen */}
+      {verifikasi && (
+        <div className="anim-pop rounded-2xl border border-sky-200 bg-sky-50 p-3 text-center text-sm font-semibold text-sky-700">
+          ⏳ {verifikasi}
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => bukaKamera("masuk")}
-          disabled={!sudahMasuk ? false : true}
+          disabled={sudahMasuk || !!verifikasi}
           className={`rounded-2xl px-4 py-4 text-sm font-extrabold shadow-md transition active:scale-95 disabled:opacity-40 ${
             sudahMasuk ? "bg-slate-200 text-slate-500" : "bg-emerald-700 text-white shadow-emerald-700/25 hover:bg-emerald-800"
           }`}
@@ -227,7 +290,7 @@ export default function AbsensiPage() {
         </button>
         <button
           onClick={() => bukaKamera("pulang")}
-          disabled={!sudahMasuk || sudahPulang}
+          disabled={!sudahMasuk || sudahPulang || !!verifikasi}
           className={`rounded-2xl px-4 py-4 text-sm font-extrabold shadow-md transition active:scale-95 disabled:opacity-40 ${
             sudahMasuk && !sudahPulang ? "bg-sky-700 text-white shadow-sky-700/25 hover:bg-sky-800" : "bg-slate-200 text-slate-500"
           }`}
