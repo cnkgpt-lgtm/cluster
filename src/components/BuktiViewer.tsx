@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useEscape } from "./useEscape";
+import Ikon from "./Ikon";
 import { isDriveLink, driveThumbnailUrl } from "@/lib/gdrive-link";
 
 // Penampil bukti bayar bersama: dipakai di Validasi & Kartu Kontrol.
@@ -18,6 +20,7 @@ export default function BuktiViewer({
 }) {
   const [lihat, setLihat] = useState(false);
   const [pdfMode, setPdfMode] = useState(false);
+  useEscape(lihat, () => setLihat(false));
   const bukaModal = () => {
     setPdfMode(false);
     setLihat(true);
@@ -39,7 +42,7 @@ export default function BuktiViewer({
             onClick={bukaModal}
             className="rounded-xl bg-sky-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-sky-800"
           >
-            👁️ Lihat di Sini
+            <span className="inline-flex items-center gap-2"><Ikon nama="lihat" className="h-4 w-4" /> Lihat di Sini</span>
           </button>
           <a
             href={proxy}
@@ -51,7 +54,7 @@ export default function BuktiViewer({
           </a>
         </div>
         {!ringkas && (
-          <p className="mt-1 text-xs text-slate-400">Tersimpan di Telegram, tampil tanpa mengunduh.</p>
+          <p className="mt-1 text-xs text-slate-500">Tersimpan di Telegram, tampil tanpa mengunduh.</p>
         )}
 
         {lihat && (
@@ -60,7 +63,7 @@ export default function BuktiViewer({
               onClick={() => setLihat(false)}
               className="self-end rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
             >
-              ✕ Tutup
+              <span className="inline-flex items-center gap-2"><Ikon nama="silang" className="h-4 w-4" /> Tutup</span>
             </button>
             <div
               className="flex min-h-0 flex-1 items-center justify-center py-2"
@@ -98,7 +101,7 @@ export default function BuktiViewer({
             />
           ) : null}
           <span className="mt-2 inline-block rounded-xl bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-200">
-            📁 Lihat Bukti di Google Drive ↗
+            Lihat Bukti di Google Drive ↗
           </span>
         </a>
       </div>
@@ -110,7 +113,7 @@ export default function BuktiViewer({
       <a href={url} target="_blank" rel="noreferrer" className="block">
         {url.endsWith(".pdf") ? (
           <span className="inline-block rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
-            📄 Lihat Bukti (PDF) ↗
+            Lihat Bukti (PDF) ↗
           </span>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element

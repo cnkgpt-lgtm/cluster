@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useEscape } from "./useEscape";
+import Ikon from "./Ikon";
 
 export interface NavItem {
   href: string;
@@ -12,67 +14,67 @@ export interface NavItem {
 
 export const NAV_PER_ROLE: Record<string, NavItem[]> = {
   WARGA: [
-    { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { href: "/iuran", label: "Iuran Saya", icon: "💳" },
-    { href: "/kartu-saya", label: "Kartu Saya", icon: "🪪" },
-    { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
-    { href: "/cctv", label: "CCTV", icon: "📹" },
-    { href: "/warga", label: "Info Warga", icon: "👥" },
-    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
-    { href: "/profil", label: "Profil Saya", icon: "👤" },
+    { href: "/dashboard", label: "Dashboard", icon: "beranda" },
+    { href: "/iuran", label: "Iuran Saya", icon: "iuran" },
+    { href: "/kartu-saya", label: "Kartu Saya", icon: "kartu" },
+    { href: "/pengumuman", label: "Pengumuman", icon: "kabar" },
+    { href: "/cctv", label: "CCTV", icon: "cctv" },
+    { href: "/warga", label: "Info Warga", icon: "warga" },
+    { href: "/notifikasi", label: "Notifikasi", icon: "notifikasi" },
+    { href: "/profil", label: "Profil Saya", icon: "pengguna" },
   ],
   PENGURUS: [
-    { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { href: "/iuran", label: "Iuran", icon: "💳" },
-    { href: "/tagihan", label: "Kelola Tagihan", icon: "🧾" },
-    { href: "/validasi", label: "Validasi Bayar", icon: "✅" },
-    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "🗂️" },
-    { href: "/kas", label: "Kas", icon: "💰" },
-    { href: "/laporan", label: "Laporan", icon: "📊" },
-    { href: "/pengeluaran", label: "Pengeluaran", icon: "💸" },
-    { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
-    { href: "/cctv", label: "CCTV", icon: "📹" },
-    { href: "/warga", label: "Info Warga", icon: "👥" },
-    { href: "/absensi/rekap", label: "Absensi", icon: "🛡️" },
-    { href: "/pengaturan/lokasi", label: "Lokasi", icon: "🗺️" },
-    { href: "/pengguna", label: "Pengguna", icon: "⚙️" },
-    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
-    { href: "/profil", label: "Profil Saya", icon: "👤" },
+    { href: "/dashboard", label: "Dashboard", icon: "beranda" },
+    { href: "/iuran", label: "Iuran", icon: "iuran" },
+    { href: "/tagihan", label: "Kelola Tagihan", icon: "iuran" },
+    { href: "/validasi", label: "Validasi Bayar", icon: "validasi" },
+    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "kartu" },
+    { href: "/kas", label: "Kas", icon: "kas" },
+    { href: "/laporan", label: "Laporan", icon: "laporan" },
+    { href: "/pengeluaran", label: "Pengeluaran", icon: "pengeluaran" },
+    { href: "/pengumuman", label: "Pengumuman", icon: "kabar" },
+    { href: "/cctv", label: "CCTV", icon: "cctv" },
+    { href: "/warga", label: "Info Warga", icon: "warga" },
+    { href: "/absensi/rekap", label: "Absensi", icon: "absensi" },
+    { href: "/pengaturan/lokasi", label: "Lokasi", icon: "peta" },
+    { href: "/pengguna", label: "Pengguna", icon: "pengaturan" },
+    { href: "/notifikasi", label: "Notifikasi", icon: "notifikasi" },
+    { href: "/profil", label: "Profil Saya", icon: "pengguna" },
   ],
   BENDAHARA: [
-    { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { href: "/iuran", label: "Iuran", icon: "💳" },
-    { href: "/tagihan", label: "Kelola Tagihan", icon: "🧾" },
-    { href: "/validasi", label: "Validasi Bayar", icon: "✅" },
-    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "🗂️" },
-    { href: "/kas", label: "Kas", icon: "💰" },
-    { href: "/laporan", label: "Laporan", icon: "📊" },
-    { href: "/pengeluaran", label: "Pengeluaran", icon: "💸" },
-    { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
-    { href: "/cctv", label: "CCTV", icon: "📹" },
-    { href: "/warga", label: "Info Warga", icon: "👥" },
-    { href: "/absensi/rekap", label: "Absensi", icon: "🛡️" },
-    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
-    { href: "/profil", label: "Profil Saya", icon: "👤" },
+    { href: "/dashboard", label: "Dashboard", icon: "beranda" },
+    { href: "/iuran", label: "Iuran", icon: "iuran" },
+    { href: "/tagihan", label: "Kelola Tagihan", icon: "iuran" },
+    { href: "/validasi", label: "Validasi Bayar", icon: "validasi" },
+    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "kartu" },
+    { href: "/kas", label: "Kas", icon: "kas" },
+    { href: "/laporan", label: "Laporan", icon: "laporan" },
+    { href: "/pengeluaran", label: "Pengeluaran", icon: "pengeluaran" },
+    { href: "/pengumuman", label: "Pengumuman", icon: "kabar" },
+    { href: "/cctv", label: "CCTV", icon: "cctv" },
+    { href: "/warga", label: "Info Warga", icon: "warga" },
+    { href: "/absensi/rekap", label: "Absensi", icon: "absensi" },
+    { href: "/notifikasi", label: "Notifikasi", icon: "notifikasi" },
+    { href: "/profil", label: "Profil Saya", icon: "pengguna" },
   ],
   SEKRETARIS: [
-    { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "🗂️" },
-    { href: "/laporan", label: "Laporan", icon: "📊" },
-    { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
-    { href: "/iuran", label: "Iuran Saya", icon: "💳" },
-    { href: "/cctv", label: "CCTV", icon: "📹" },
-    { href: "/warga", label: "Info Warga", icon: "👥" },
-    { href: "/absensi/rekap", label: "Absensi", icon: "🛡️" },
-    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
-    { href: "/profil", label: "Profil Saya", icon: "👤" },
+    { href: "/dashboard", label: "Dashboard", icon: "beranda" },
+    { href: "/kartu-kontrol", label: "Kartu Kontrol", icon: "kartu" },
+    { href: "/laporan", label: "Laporan", icon: "laporan" },
+    { href: "/pengumuman", label: "Pengumuman", icon: "kabar" },
+    { href: "/iuran", label: "Iuran Saya", icon: "iuran" },
+    { href: "/cctv", label: "CCTV", icon: "cctv" },
+    { href: "/warga", label: "Info Warga", icon: "warga" },
+    { href: "/absensi/rekap", label: "Absensi", icon: "absensi" },
+    { href: "/notifikasi", label: "Notifikasi", icon: "notifikasi" },
+    { href: "/profil", label: "Profil Saya", icon: "pengguna" },
   ],
   SECURITY: [
-    { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-    { href: "/absensi", label: "Absensi", icon: "🛡️" },
-    { href: "/pengumuman", label: "Pengumuman", icon: "📢" },
-    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
-    { href: "/profil", label: "Profil Saya", icon: "👤" },
+    { href: "/dashboard", label: "Dashboard", icon: "beranda" },
+    { href: "/absensi", label: "Absensi", icon: "absensi" },
+    { href: "/pengumuman", label: "Pengumuman", icon: "kabar" },
+    { href: "/notifikasi", label: "Notifikasi", icon: "notifikasi" },
+    { href: "/profil", label: "Profil Saya", icon: "pengguna" },
   ],
 };
 
@@ -88,34 +90,34 @@ const ROLE_LABEL: Record<string, string> = {
 interface TabItem { href: string; label: string; icon: string; utama?: boolean }
 const BOTTOM_NAV: Record<string, TabItem[]> = {
   WARGA: [
-    { href: "/dashboard", label: "Beranda", icon: "🏠" },
-    { href: "/pengumuman", label: "Kabar", icon: "📢" },
-    { href: "/iuran", label: "Bayar", icon: "💳", utama: true },
-    { href: "/kartu-saya", label: "Kartu", icon: "🪪" },
+    { href: "/dashboard", label: "Beranda", icon: "beranda" },
+    { href: "/pengumuman", label: "Kabar", icon: "kabar" },
+    { href: "/iuran", label: "Bayar", icon: "iuran", utama: true },
+    { href: "/kartu-saya", label: "Kartu", icon: "kartu" },
   ],
   PENGURUS: [
-    { href: "/dashboard", label: "Beranda", icon: "🏠" },
-    { href: "/iuran", label: "Iuran", icon: "💳" },
-    { href: "/validasi", label: "Validasi", icon: "✅", utama: true },
-    { href: "/laporan", label: "Laporan", icon: "📊" },
+    { href: "/dashboard", label: "Beranda", icon: "beranda" },
+    { href: "/iuran", label: "Iuran", icon: "iuran" },
+    { href: "/validasi", label: "Validasi", icon: "validasi", utama: true },
+    { href: "/laporan", label: "Laporan", icon: "laporan" },
   ],
   BENDAHARA: [
-    { href: "/dashboard", label: "Beranda", icon: "🏠" },
-    { href: "/kas", label: "Kas", icon: "💰" },
-    { href: "/validasi", label: "Validasi", icon: "✅", utama: true },
-    { href: "/laporan", label: "Laporan", icon: "📊" },
+    { href: "/dashboard", label: "Beranda", icon: "beranda" },
+    { href: "/kas", label: "Kas", icon: "kas" },
+    { href: "/validasi", label: "Validasi", icon: "validasi", utama: true },
+    { href: "/laporan", label: "Laporan", icon: "laporan" },
   ],
   SEKRETARIS: [
-    { href: "/dashboard", label: "Beranda", icon: "🏠" },
-    { href: "/pengumuman", label: "Kabar", icon: "📢" },
-    { href: "/kartu-kontrol", label: "Kartu", icon: "🗂️", utama: true },
-    { href: "/laporan", label: "Laporan", icon: "📊" },
+    { href: "/dashboard", label: "Beranda", icon: "beranda" },
+    { href: "/pengumuman", label: "Kabar", icon: "kabar" },
+    { href: "/kartu-kontrol", label: "Kartu", icon: "kartu", utama: true },
+    { href: "/laporan", label: "Laporan", icon: "laporan" },
   ],
   SECURITY: [
-    { href: "/dashboard", label: "Beranda", icon: "🏠" },
-    { href: "/pengumuman", label: "Kabar", icon: "📢" },
-    { href: "/absensi", label: "Absensi", icon: "🛡️", utama: true },
-    { href: "/notifikasi", label: "Notifikasi", icon: "🔔" },
+    { href: "/dashboard", label: "Beranda", icon: "beranda" },
+    { href: "/pengumuman", label: "Kabar", icon: "kabar" },
+    { href: "/absensi", label: "Absensi", icon: "absensi", utama: true },
+    { href: "/notifikasi", label: "Notifikasi", icon: "notifikasi" },
   ],
 };
 
@@ -126,6 +128,7 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  useEscape(open, () => setOpen(false));
   const nav = NAV_PER_ROLE[user.role] ?? NAV_PER_ROLE.WARGA;
 
   const menu = (
@@ -143,7 +146,7 @@ export default function Sidebar({
                 : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
             }`}
           >
-            <span className="text-lg leading-none">{item.icon}</span>
+            <span className="text-lg leading-none"><Ikon nama={item.icon} className="h-5 w-5" /></span>
             {item.label}
           </Link>
         );
@@ -158,8 +161,8 @@ export default function Sidebar({
       {/* Bar atas mobile (tanpa hamburger — menu pindah ke bawah) */}
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
         <img src="/logo/logo-stacked.svg" alt="Logo SISTER" className="h-9 w-auto" />
-        <Link href="/notifikasi" className="rounded-lg border border-slate-200 p-2 text-slate-600">
-          🔔
+        <Link href="/notifikasi" className="rounded-lg border border-slate-200 p-2 text-slate-600" aria-label="Notifikasi">
+          <Ikon nama="notifikasi" className="h-5 w-5" />
         </Link>
       </div>
 
@@ -179,7 +182,7 @@ export default function Sidebar({
             onClick={() => setOpen(true)}
             className="flex flex-col items-center gap-1 py-2.5 text-slate-500 transition active:scale-95"
           >
-            <span className="text-xl leading-none">☰</span>
+            <Ikon nama="menu" className="h-6 w-6" />
             <span className="text-[11px] font-semibold">Lainnya</span>
           </button>
         </div>
@@ -220,7 +223,7 @@ function TabBawah({ tab, pathname }: { tab: TabItem; pathname: string }) {
         aktif ? "text-emerald-700" : "text-slate-500"
       }`}
     >
-      <span className="text-xl leading-none">{tab.icon}</span>
+      <Ikon nama={tab.icon} className="h-6 w-6" />
       <span className={`text-[11px] ${aktif ? "font-bold" : "font-semibold"}`}>{tab.label}</span>
       {aktif && <span className="h-1 w-1 rounded-full bg-emerald-600" />}
     </Link>
@@ -238,7 +241,7 @@ function TabUtama({ tab, pathname }: { tab: TabItem; pathname: string }) {
             : "bg-emerald-700 text-white shadow-emerald-700/30"
         }`}
       >
-        {tab.icon}
+        {tab.icon && <Ikon nama={tab.icon} className="h-7 w-7" />}
       </span>
       <span className={`-mt-2 text-[11px] font-bold ${aktif ? "text-emerald-700" : "text-slate-500"}`}>
         {tab.label}
@@ -255,7 +258,7 @@ function SidebarHead({ user, onClose }: { user: { name: string; role: string }; 
       </div>
       {onClose && (
         <button onClick={onClose} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Tutup menu">
-          ✕
+          <Ikon nama="silang" className="h-5 w-5" />
         </button>
       )}
     </div>

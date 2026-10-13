@@ -1,3 +1,5 @@
+import Ikon from "./Ikon";
+
 export function StatCard({
   label,
   value,
@@ -21,7 +23,7 @@ export function StatCard({
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-slate-500">{label}</p>
-        <span className={`rounded-xl px-2.5 py-1.5 text-lg ${tones[tone]}`}>{icon}</span>
+        <span className={`rounded-xl p-2 ${tones[tone]}`}><Ikon nama={icon} className="h-5 w-5" /></span>
       </div>
       <p className="mt-2 break-words text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">{value}</p>
       {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
@@ -34,7 +36,7 @@ export function Card({
   action,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   action?: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -85,7 +87,7 @@ export function badgeStatusBayar(status: string) {
 export function Empty({ icon, title, sub }: { icon: string; title: string; sub?: string }) {
   return (
     <div className="flex flex-col items-center py-10 text-center">
-      <span className="text-4xl">{icon}</span>
+      <span className="text-slate-300"><Ikon nama={icon} className="h-10 w-10" /></span>
       <p className="mt-2 font-semibold text-slate-700">{title}</p>
       {sub && <p className="mt-1 text-sm text-slate-500">{sub}</p>}
     </div>

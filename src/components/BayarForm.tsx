@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import Ikon from "./Ikon";
 
 declare global {
   interface Window {
@@ -20,13 +21,13 @@ declare global {
 }
 
 const METODE = [
-  { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun, otomatis lunas", icon: "📱" },
-  { id: "VA_BCA", label: "VA BCA", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
-  { id: "VA_BRI", label: "VA BRI", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
-  { id: "VA_BNI", label: "VA BNI", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
-  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
-  { id: "VA_PERMATA", label: "VA Permata", desc: "Upload bukti transfer untuk validasi bendahara", icon: "🏦" },
-  { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti untuk validasi bendahara", icon: "🧾" },
+  { id: "QRIS", label: "QRIS", desc: "Scan QR dari e-wallet / m-banking apa pun, otomatis lunas", icon: "hp" },
+  { id: "VA_BCA", label: "VA BCA", desc: "Upload bukti transfer untuk validasi bendahara", icon: "bank" },
+  { id: "VA_BRI", label: "VA BRI", desc: "Upload bukti transfer untuk validasi bendahara", icon: "bank" },
+  { id: "VA_BNI", label: "VA BNI", desc: "Upload bukti transfer untuk validasi bendahara", icon: "bank" },
+  { id: "VA_MANDIRI", label: "VA Mandiri", desc: "Upload bukti transfer untuk validasi bendahara", icon: "bank" },
+  { id: "VA_PERMATA", label: "VA Permata", desc: "Upload bukti transfer untuk validasi bendahara", icon: "bank" },
+  { id: "TRANSFER_MANUAL", label: "Transfer Manual", desc: "Transfer ke rekening RT lalu unggah bukti untuk validasi bendahara", icon: "iuran" },
 ];
 
 // Metode yang memakai upload bukti (bukan otomatis): VA & transfer manual.
@@ -133,7 +134,7 @@ export default function BayarForm({
                 : "border-slate-200 bg-white hover:border-slate-300"
             }`}
           >
-            <span className="text-2xl">{m.icon}</span>
+            <Ikon nama={m.icon} className="h-7 w-7" />
             <span>
               <span className="block font-bold text-slate-800">{m.label}</span>
               <span className="block text-xs text-slate-500">{m.desc}</span>
@@ -153,9 +154,9 @@ export default function BayarForm({
             lalu unggah bukti transfer di bawah. Pembayaran aktif setelah divalidasi bendahara.
           </p>
           <label className="mt-3 flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border-2 border-dashed border-amber-300 bg-white px-4 py-6 text-center transition hover:border-amber-400 hover:bg-amber-50">
-            <span className="text-3xl">📤</span>
+            <Ikon nama="unggah" className="h-8 w-8 text-slate-500" />
             <span className="text-sm font-bold text-amber-800">
-              {namaFile ? `📄 ${namaFile}` : "Ketuk untuk upload bukti transfer"}
+              {namaFile ? `${namaFile}` : "Ketuk untuk upload bukti transfer"}
             </span>
             <span className="text-xs text-slate-500">JPG / PNG / WEBP / PDF, maks 5 MB</span>
             <input
