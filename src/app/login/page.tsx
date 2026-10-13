@@ -4,12 +4,30 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+// Akun demo — ketuk untuk mengisi email & kata sandi otomatis.
+const AKUN_DEMO = [
+  { role: "Pengurus", email: "pengurus@rtku.local", password: "Pengurus123", icon: "🧑‍💼" },
+  { role: "Bendahara", email: "bendahara@rtku.local", password: "Bendahara123", icon: "💰" },
+  { role: "Sekretaris", email: "sekretaris@rtku.local", password: "Sekretaris123", icon: "📝" },
+  { role: "Security", email: "security@rtku.local", password: "Security123", icon: "🛡️" },
+  { role: "Warga", email: "warga@rtku.local", password: "Warga123", icon: "🏠" },
+];
+
 function LoginForm() {
   const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(params.get("error") ? "Email atau kata sandi salah." : "");
   const [loading, setLoading] = useState(false);
+  const [demoBuka, setDemoBuka] = useState(false);
+  const [demoDipilih, setDemoDipilih] = useState("");
+
+  const pilihDemo = (akun: { email: string; password: string }) => {
+    setEmail(akun.email);
+    setPassword(akun.password);
+    setDemoDipilih(akun.email);
+    setError("");
+  };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -78,12 +96,44 @@ function LoginForm() {
         </button>
       </form>
 
-      <div className="mt-6 rounded-xl bg-slate-50 p-4 text-xs text-slate-500">
-        <p className="mb-1 font-semibold text-slate-600">Akun demo:</p>
-        <p>Pengurus: pengurus@rtku.local / Pengurus123</p>
-        <p>Bendahara: bendahara@rtku.local / Bendahara123</p>
-        <p>Sekretaris: sekretaris@rtku.local / Sekretaris123</p>
-        <p>Warga: warga@rtku.local / Warga123</p>
+      <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <button
+          type="button"
+          onClick={() => setDemoBuka((b) => !b)}
+          className="flex w-full items-center justify-between text-sm font-semibold text-slate-600"
+        >
+          <span>Akun demo — {AKUN_DEMO.length} level akses</span>
+          <span className="text-slate-400">{demoBuka ? "−" : "+"}</span>
+        </button>
+        {demoBuka && (
+          <div className="anim-fade-up mt-3 space-y-2">
+            {AKUN_DEMO.map((akun) => {
+              const aktif = demoDipilih === akun.email;
+              return (
+                <button
+                  key={akun.email}
+                  type="button"
+                  onClick={() => pilihDemo(akun)}
+                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition active:scale-[0.99] ${
+                    aktif
+                      ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                      : "border-slate-200 bg-white hover:border-emerald-300"
+                  }`}
+                >
+                  <span className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                    <span className="text-lg leading-none">{akun.icon}</span>
+                    {akun.role}
+                    {aktif && <span className="text-emerald-600">✓</span>}
+                  </span>
+                  <span className="text-xs text-slate-400">{akun.email}</span>
+                </button>
+              );
+            })}
+            <p className="pt-1 text-center text-xs text-slate-400">
+              Ketuk salah satu — email & kata sandi terisi otomatis, tinggal tekan Masuk.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
