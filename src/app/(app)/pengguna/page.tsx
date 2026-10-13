@@ -143,12 +143,12 @@ export default function PenggunaPage() {
         {loading ? (
           <div className="space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-12 rounded-xl" />)}</div>
         ) : items.length === 0 ? (
-          <Empty icon="👥" title="Belum ada pengguna" />
+          <Empty icon="warga" title="Belum ada pengguna" />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-400">
+                <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
                   <th className="py-2 pr-4">Nama</th>
                   <th className="py-2 pr-4">Email</th>
                   <th className="py-2 pr-4">Role</th>

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card } from "@/components/ui";
 
 const Peta = dynamic(() => import("@/components/PetaLokasi"), { ssr: false });
@@ -51,7 +52,7 @@ export default function LokasiPage() {
       (p) => {
         setLat(p.coords.latitude);
         setLng(p.coords.longitude);
-        setPesan({ ok: true, teks: "📍 Titik diambil dari posisi Anda. Geser bila perlu, lalu simpan." });
+        setPesan({ ok: true, teks: "Titik diambil dari posisi Anda. Geser bila perlu, lalu simpan." });
       },
       () => setPesan({ ok: false, teks: "Izin lokasi ditolak." }),
       { enableHighAccuracy: true, timeout: 15000 },
@@ -72,7 +73,7 @@ export default function LokasiPage() {
         setPesan({ ok: false, teks: "Gagal menyimpan. Periksa kembali titik & radius." });
       } else {
         setDiatur(true);
-        setPesan({ ok: true, teks: `✅ Lokasi "${d.lokasi.nama}" tersimpan (radius ${d.lokasi.radiusMeter} m).` });
+        setPesan({ ok: true, teks: `Lokasi "${d.lokasi.nama}" tersimpan (radius ${d.lokasi.radiusMeter} m).` });
       }
     } catch {
       setPesan({ ok: false, teks: "Jaringan bermasalah." });
@@ -94,7 +95,7 @@ export default function LokasiPage() {
   return (
     <div className="anim-fade-up mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="text-xl font-extrabold text-slate-800">🗺️ Lokasi Absensi</h1>
+        <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800"><Ikon nama="peta" className="h-6 w-6" /> Lokasi Absensi</h1>
         <p className="text-sm text-slate-500">
           Tentukan titik perumahan di peta. Security hanya bisa absen di dalam lingkaran hijau.
         </p>
@@ -106,9 +107,9 @@ export default function LokasiPage() {
         </div>
       )}
 
-      <Card title={diatur ? "✅ Titik sudah diatur" : "⚠️ Titik belum diatur"}>
+      <Card title={diatur ? <span className="inline-flex items-center gap-2"><Ikon nama="cek" className="h-5 w-5" /> Titik sudah diatur</span> : <span className="inline-flex items-center gap-2"><Ikon nama="peringatan" className="h-5 w-5" /> Titik belum diatur</span>}>
         {loading ? (
-          <p className="text-sm text-slate-400">Memuat peta…</p>
+          <p className="text-sm text-slate-500">Memuat peta…</p>
         ) : (
           <div className="space-y-4">
             <Peta
@@ -118,7 +119,7 @@ export default function LokasiPage() {
               onPilih={(a, b) => { setLat(a); setLng(b); }}
             />
             <p className="text-xs text-slate-500">
-              Ketuk peta atau seret pin 📍 untuk memindahkan titik. Lingkaran hijau = area absen.
+              Ketuk peta atau seret pin untuk memindahkan titik. Lingkaran hijau = area absen.
             </p>
 
             <div>
@@ -148,25 +149,25 @@ export default function LokasiPage() {
                 onChange={(e) => setRadius(Number(e.target.value))}
                 className="mt-2 w-full accent-emerald-600"
               />
-              <div className="flex justify-between text-xs text-slate-400">
+              <div className="flex justify-between text-xs text-slate-500">
                 <span>25 m</span><span>1000 m</span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <div className="rounded-xl bg-slate-50 px-3 py-2">
-                <p className="text-xs text-slate-400">Latitude</p>
+                <p className="text-xs text-slate-500">Latitude</p>
                 <p className="font-mono text-sm font-bold">{lat.toFixed(6)}</p>
               </div>
               <div className="rounded-xl bg-slate-50 px-3 py-2">
-                <p className="text-xs text-slate-400">Longitude</p>
+                <p className="text-xs text-slate-500">Longitude</p>
                 <p className="font-mono text-sm font-bold">{lng.toFixed(6)}</p>
               </div>
               <button
                 onClick={gunakanLokasiSaya}
                 className="rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-700 transition hover:bg-sky-100"
               >
-                📍 Lokasi saya
+                <span className="inline-flex items-center gap-2"><Ikon nama="lokasi" className="h-4 w-4" /> Lokasi saya</span>
               </button>
             </div>
 
@@ -175,7 +176,7 @@ export default function LokasiPage() {
               disabled={menyimpan}
               className="w-full rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-800 active:scale-95 disabled:opacity-50"
             >
-              {menyimpan ? "⏳ Menyimpan…" : "💾 Simpan Lokasi"}
+              {menyimpan ? "Menyimpan…" : "Simpan Lokasi"}
             </button>
           </div>
         )}

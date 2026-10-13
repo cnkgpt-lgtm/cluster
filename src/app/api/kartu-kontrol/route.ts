@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
-  // ---------- Detail 1 warga ----------
+  // Detail 1 warga
   if (userId) {
     const warga = await prisma.user.findUnique({
       where: { id: userId },
@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // ---------- Daftar semua warga ----------
+  // Daftar semua warga
   const daftar = await prisma.user.findMany({
     where: { role: "WARGA", isActive: true },
     select: {

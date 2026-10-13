@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Ikon from "@/components/Ikon";
 import { Card, Empty, Badge } from "@/components/ui";
 import BuktiViewer from "@/components/BuktiViewer";
 
 const STORAGE_INFO: Record<string, { label: string; icon: string; ok: boolean }> = {
-  R2: { label: "Cloudflare R2", icon: "☁️", ok: true },
-  GOOGLE_DRIVE: { label: "Google Drive", icon: "📁", ok: true },
-  TELEGRAM: { label: "Telegram", icon: "✈️", ok: true },
-  DATABASE: { label: "Sementara (database)", icon: "💾", ok: false },
+  R2: { label: "Cloudflare R2", icon: "awan", ok: true },
+  GOOGLE_DRIVE: { label: "Google Drive", icon: "folder", ok: true },
+  TELEGRAM: { label: "Telegram", icon: "kirim", ok: true },
+  DATABASE: { label: "Sementara (database)", icon: "basisdata", ok: false },
 };
 
 function StatusPenyimpanan() {
@@ -32,7 +33,7 @@ function StatusPenyimpanan() {
           : "border-amber-200 bg-amber-50 text-amber-800"
       }`}
     >
-      <span className="text-base">{info.icon}</span>
+      <Ikon nama={info.icon} className="h-5 w-5" />
       <span>
         Penyimpanan bukti: <b>{info.label}</b>
         {!info.ok && (
@@ -105,7 +106,7 @@ export default function ValidasiPage() {
         {loading ? (
           <div className="space-y-2">{[1, 2].map((i) => <div key={i} className="skeleton h-24 rounded-xl" />)}</div>
         ) : items.length === 0 ? (
-          <Empty icon="✅" title="Tidak ada yang menunggu" sub="Semua bukti transfer sudah divalidasi." />
+          <Empty icon="validasi" title="Tidak ada yang menunggu" sub="Semua bukti transfer sudah divalidasi." />
         ) : (
           <ul className="space-y-4">
             {items.map((p) => (
@@ -114,7 +115,7 @@ export default function ValidasiPage() {
                   <div>
                     <p className="font-bold text-slate-800">{p.user.name}</p>
                     <p className="text-sm text-slate-500">{p.tagihanWarga.tagihan.judul}</p>
-                    <p className="text-xs text-slate-400">{new Date(p.createdAt).toLocaleString("id-ID")}</p>
+                    <p className="text-xs text-slate-500">{new Date(p.createdAt).toLocaleString("id-ID")}</p>
                   </div>
                   <p className="text-lg font-extrabold text-slate-900">Rp{p.nominal.toLocaleString("id-ID")}</p>
                 </div>
@@ -123,7 +124,7 @@ export default function ValidasiPage() {
                   <BuktiViewer url={p.buktiUrl} pembayaranId={p.id} />
                 ) : (
                   <div className="mt-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
-                    💳 Pembayaran <b>{p.metode.replace(/_/g, " ")}</b> tanpa bukti upload.
+                    Pembayaran <b>{p.metode.replace(/_/g, " ")}</b> tanpa bukti upload.
                     Cek mutasi rekening bank RT sebelum memvalidasi.
                   </div>
                 )}
@@ -141,14 +142,14 @@ export default function ValidasiPage() {
                     disabled={acting === p.id}
                     className="flex-1 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 disabled:opacity-60"
                   >
-                    {acting === p.id ? "Memproses..." : "✅ Terima & Lunaskan"}
+                    {acting === p.id ? "Memproses..." : "Terima & Lunaskan"}
                   </button>
                   <button
                     onClick={() => putuskan(p.id, "TOLAK")}
                     disabled={acting === p.id}
                     className="flex-1 rounded-xl border border-red-300 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-60"
                   >
-                    ❌ Tolak
+                    Tolak
                   </button>
                 </div>
               </li>

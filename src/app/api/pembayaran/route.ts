@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   // Nominal selalu dari server
   const nominal = tw.nominal;
 
-  // ---- Transfer manual & VA: wajib bukti, menunggu validasi bendahara ----
+  // Transfer manual & VA: wajib bukti, menunggu validasi bendahara
   if (metode === "TRANSFER_MANUAL" || metode.startsWith("VA_")) {
     if (!buktiFile) {
       return NextResponse.json({ error: "VALIDATION_ERROR", detail: "bukti transfer wajib diunggah" }, { status: 400 });
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, pembayaran: { id: pembayaran.id, status: pembayaran.status } });
   }
 
-  // ---- Online (QRIS): pakai ulang transaksi PENDING yang masih hidup ----
+  // QRIS: pakai ulang transaksi PENDING yang masih hidup
   // Catatan: VA kini lewat alur bukti di atas, sehingga di sini hanya QRIS.
   // Serialisasi check-then-act (hasil audit keamanan run-1): row lock FOR UPDATE.
   const orderId = `RTKU-${Date.now()}-${randomBytes(3).toString("hex").toUpperCase()}`;

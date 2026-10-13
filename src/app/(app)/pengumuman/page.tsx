@@ -39,7 +39,7 @@ export default async function PengumumanPage() {
 
       {items.length === 0 ? (
         <Card title="Daftar Pengumuman">
-          <Empty icon="📭" title="Belum ada pengumuman" />
+          <Empty icon="kabar" title="Belum ada pengumuman" />
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -51,11 +51,11 @@ export default async function PengumumanPage() {
             >
               <div className="mb-2 flex items-center gap-2">
                 <Badge tone={KATEGORI_TONE[p.kategori] ?? "slate"}>{p.kategori}</Badge>
-                <span className="text-xs text-slate-400">{formatTanggalWita(p.createdAt)}</span>
+                <span className="text-xs text-slate-500">{formatTanggalWita(p.createdAt)}</span>
               </div>
               <h2 className="font-bold text-slate-900">{p.judul}</h2>
               <p className="mt-1 line-clamp-2 text-sm text-slate-500">{p.isi}</p>
-              <p className="mt-3 text-xs text-slate-400">oleh {p.dibuatOleh.name}</p>
+              <p className="mt-3 text-xs text-slate-500">oleh {p.dibuatOleh.name}</p>
             </Link>
           ))}
         </div>

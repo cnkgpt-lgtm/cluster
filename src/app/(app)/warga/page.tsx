@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { Card, Badge, Empty } from "@/components/ui";
+import Ikon from "@/components/Ikon";
 
 export const dynamic = "force-dynamic";
 
@@ -36,12 +37,12 @@ export default async function WargaPage() {
 
       <Card title={`Pengurus RT (${pengurus.length})`}>
         {pengurus.length === 0 ? (
-          <Empty icon="👥" title="Belum ada data" />
+          <Empty icon="warga" title="Belum ada data" />
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {pengurus.map((u) => (
               <li key={u.id} className="flex items-center gap-3 rounded-2xl border border-slate-100 p-3">
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-emerald-100 text-lg">🧑‍💼</span>
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-emerald-100"><Ikon nama="pengguna" className="h-6 w-6 text-emerald-700" /></span>
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-slate-800">{u.name}</p>
                   <p className="text-xs text-slate-500">
@@ -57,19 +58,19 @@ export default async function WargaPage() {
 
       <Card title={`Warga (${warga.length})`}>
         {warga.length === 0 ? (
-          <Empty icon="🏘️" title="Belum ada data warga" />
+          <Empty icon="beranda" title="Belum ada data warga" />
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {warga.map((u) => (
               <li key={u.id} className="flex items-center gap-3 rounded-2xl border border-slate-100 p-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-lg">🏠</span>
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100"><Ikon nama="beranda" className="h-6 w-6 text-slate-500" /></span>
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-slate-800">{u.name}</p>
                   <p className="text-xs text-slate-500">
                     {u.blok ? `Blok ${u.blok}` : ""}{u.nomorRumah ? ` No. ${u.nomorRumah}` : ""}
-                    {u.phone ? ` · 📱 ${u.phone}` : ""}
+                    {u.phone ? ` · ${u.phone}` : ""}
                   </p>
-                  {u.alamat && <p className="mt-0.5 truncate text-xs text-slate-400">📍 {u.alamat}</p>}
+                  {u.alamat && <p className="mt-0.5 truncate text-xs text-slate-500">{u.alamat}</p>}
                 </div>
               </li>
             ))}
