@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
+import Ikon from "./Ikon";
 
 export default function CctvPlayer({ src, nama }: { src: string; nama: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -45,7 +46,7 @@ export default function CctvPlayer({ src, nama }: { src: string; nama: string })
       </div>
       {error ? (
         <div className="flex aspect-video flex-col items-center justify-center gap-2 p-6 text-center">
-          <span className="text-3xl">📡</span>
+          <Ikon nama="cctv" className="h-8 w-8 text-slate-500" />
           <p className="text-sm text-slate-300">{error}</p>
         </div>
       ) : (

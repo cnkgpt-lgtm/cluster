@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Ikon from "./Ikon";
 
 export default function Bell() {
   const [count, setCount] = useState(0);
@@ -32,7 +33,7 @@ export default function Bell() {
       className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700"
       aria-label="Notifikasi"
     >
-      <span className="text-lg leading-none">🔔</span>
+      <Ikon nama="notifikasi" className="h-5 w-5" />
       {count > 0 && (
         <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
           {count > 99 ? "99+" : count}
