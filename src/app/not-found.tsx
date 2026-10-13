@@ -1,9 +1,10 @@
 import Link from "next/link";
+import Ikon from "@/components/Ikon";
 
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4 text-center">
-      <p className="text-7xl">🧭</p>
+      <Ikon nama="peta" className="h-16 w-16 text-emerald-200" />
       <h1 className="mt-4 text-5xl font-extrabold tracking-tight text-slate-900">404</h1>
       <p className="mt-2 max-w-sm text-sm text-slate-500">
         Halaman yang Anda tuju tidak ditemukan. Mungkin alamatnya salah ketik atau sudah tidak tersedia.

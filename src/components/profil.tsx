@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card } from "./ui";
+import Ikon from "./Ikon";
 
 const inputCls =
   "w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200";
@@ -103,7 +104,7 @@ export function ProfilForms({ awal }: { awal: ProfilAwal }) {
     <div className="space-y-6">
       <Card title="Identitas Saya">
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-emerald-100 text-2xl">👤</span>
+          <span className="grid h-14 w-14 place-items-center rounded-full bg-emerald-100"><Ikon nama="pengguna" className="h-7 w-7 text-emerald-700" /></span>
           <div>
             <p className="font-bold text-slate-900">{awal.name}</p>
             <p className="text-xs text-slate-500">

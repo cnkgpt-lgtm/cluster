@@ -37,6 +37,11 @@ body {
 .anim-fade-in { animation: fadeIn 0.35s ease both; }
 .anim-pop { animation: popIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
+/* Hormati pengguna yang sensitif terhadap gerakan: matikan semua animasi. */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up, .anim-fade-in, .anim-pop, .skeleton { animation: none !important; }
+}
+
 /* Indikator LIVE: satu titik merah statis menandai stream aktif (tanpa denyut). */
 .live-dot { display: inline-block; }
 

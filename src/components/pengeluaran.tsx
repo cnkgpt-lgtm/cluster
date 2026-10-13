@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "./ui";
+import Ikon from "./Ikon";
 
 const KATEGORI = ["OPERASIONAL", "KEAMANAN", "KEBERSIHAN", "KEGIATAN", "DARURAT", "LAINNYA"];
 
@@ -159,9 +160,9 @@ export function TombolHapusPengeluaran({ id, judul }: { id: string; judul: strin
       disabled={busy}
       aria-label={`Hapus ${judul}`}
       title="Hapus"
-      className="rounded-lg p-1.5 text-lg leading-none text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+      className="rounded-lg p-1.5 text-lg leading-none text-slate-500 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
     >
-      {busy ? "…" : "🗑️"}
+      {busy ? "…" : <Ikon nama="hapus" className="h-5 w-5" />}
     </button>
   );
 }

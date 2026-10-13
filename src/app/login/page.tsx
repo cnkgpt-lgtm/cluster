@@ -3,14 +3,15 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import Ikon from "@/components/Ikon";
 
 // Akun demo — ketuk untuk mengisi email & kata sandi otomatis.
 const AKUN_DEMO = [
-  { role: "Pengurus", email: "pengurus@rtku.local", password: "Pengurus123", icon: "🧑‍💼" },
-  { role: "Bendahara", email: "bendahara@rtku.local", password: "Bendahara123", icon: "💰" },
-  { role: "Sekretaris", email: "sekretaris@rtku.local", password: "Sekretaris123", icon: "📝" },
-  { role: "Security", email: "security@rtku.local", password: "Security123", icon: "🛡️" },
-  { role: "Warga", email: "warga@rtku.local", password: "Warga123", icon: "🏠" },
+  { role: "Pengurus", email: "pengurus@rtku.local", password: "Pengurus123", icon: "pengguna" },
+  { role: "Bendahara", email: "bendahara@rtku.local", password: "Bendahara123", icon: "kas" },
+  { role: "Sekretaris", email: "sekretaris@rtku.local", password: "Sekretaris123", icon: "dokumen" },
+  { role: "Security", email: "security@rtku.local", password: "Security123", icon: "absensi" },
+  { role: "Warga", email: "warga@rtku.local", password: "Warga123", icon: "beranda" },
 ];
 
 function LoginForm() {
@@ -103,7 +104,7 @@ function LoginForm() {
           className="flex w-full items-center justify-between text-sm font-semibold text-slate-600"
         >
           <span>Akun demo — {AKUN_DEMO.length} level akses</span>
-          <span className="text-slate-400">{demoBuka ? "−" : "+"}</span>
+          <span className="text-slate-500">{demoBuka ? "−" : "+"}</span>
         </button>
         {demoBuka && (
           <div className="anim-fade-up mt-3 space-y-2">
@@ -121,16 +122,16 @@ function LoginForm() {
                   }`}
                 >
                   <span className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <span className="text-lg leading-none">{akun.icon}</span>
+                    <Ikon nama={akun.icon} className="h-5 w-5 text-slate-500" />
                     {akun.role}
                     {aktif && <span className="text-emerald-600">✓</span>}
                   </span>
-                  <span className="text-xs text-slate-400">{akun.email}</span>
+                  <span className="text-xs text-slate-500">{akun.email}</span>
                 </button>
               );
             })}
-            <p className="pt-1 text-center text-xs text-slate-400">
-              Ketuk salah satu — email & kata sandi terisi otomatis, tinggal tekan Masuk.
+            <p className="pt-1 text-center text-xs text-slate-500">
+              Ketuk salah satu, email & kata sandi terisi otomatis, tinggal tekan Masuk.
             </p>
           </div>
         )}

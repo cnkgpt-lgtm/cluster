@@ -1,5 +1,7 @@
 "use client";
 
+import Ikon from "@/components/Ikon";
+
 export default function Error({
   error,
   reset,
@@ -9,7 +11,7 @@ export default function Error({
 }) {
   return (
     <div className="flex flex-col items-center py-16 text-center">
-      <p className="text-4xl">⚠️</p>
+      <Ikon nama="peringatan" className="h-10 w-10 text-amber-500" />
       <h1 className="mt-3 text-lg font-bold text-slate-900">Halaman gagal dimuat</h1>
       <p className="mt-1 max-w-sm text-sm text-slate-500">
         Terjadi kesalahan saat mengambil data. Periksa koneksi internet Anda, lalu coba lagi.
