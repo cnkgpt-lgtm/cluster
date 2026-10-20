@@ -89,6 +89,7 @@ model User {
   notifikasi       Notifikasi[]
   pengeluaranKas   PengeluaranKas[] @relation("KasDicatatOleh")
   absensi          Absensi[]
+  fotoKondisi      FotoKondisi[]
 
   @@map("users")
 }
@@ -262,4 +263,21 @@ model LokasiAbsensi {
   updatedAt   DateTime @updatedAt
 
   @@map("lokasi_absensi")
+}
+
+// Foto kondisi terkini cluster oleh security (patroli).
+// Timestamp (tanggal+jam) & lokasi dibakar ke dalam gambar di client sebelum upload.
+model FotoKondisi {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foto       String   // ref penyimpanan (Telegram / fallback)
+  keterangan String?  // catatan singkat security, mis. "Gerbang utama aman"
+  lat        Float
+  lng        Float
+  akurasi    Float?   // akurasi GPS (meter) saat foto diambil
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("foto_kondisi")
 }
