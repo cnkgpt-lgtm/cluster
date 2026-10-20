@@ -161,6 +161,15 @@ export default async function DashboardPage() {
         </Card>
 
         <Card
+          title="Foto Kondisi Cluster"
+          action={<Link href="/kondisi" className="text-sm font-semibold text-emerald-700 hover:underline">Kirim foto →</Link>}
+        >
+          <p className="text-sm text-slate-600">
+            Dokumentasikan suasana terkini cluster dengan foto — tanggal, jam, dan lokasi otomatis tercetak di foto.
+          </p>
+        </Card>
+
+        <Card
           title="Pengumuman Terbaru"
           action={<Link href="/pengumuman" className="text-sm font-semibold text-emerald-700 hover:underline">Lihat semua →</Link>}
         >
