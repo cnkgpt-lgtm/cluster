@@ -12,7 +12,14 @@ export async function GET() {
   return NextResponse.json({
     diatur: !!l,
     lokasi: l
-      ? { nama: l.nama, latitude: l.latitude, longitude: l.longitude, radiusMeter: l.radiusMeter }
+      ? {
+          nama: l.nama,
+          kelurahan: l.kelurahan,
+          kecamatan: l.kecamatan,
+          latitude: l.latitude,
+          longitude: l.longitude,
+          radiusMeter: l.radiusMeter,
+        }
       : null,
   });
 }
@@ -37,7 +44,8 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = (await req.json().catch(() => null)) as {
-    nama?: string; latitude?: number; longitude?: number; radiusMeter?: number;
+    nama?: string; kelurahan?: string; kecamatan?: string;
+    latitude?: number; longitude?: number; radiusMeter?: number;
   } | null;
   const lat = Number(body?.latitude);
   const lng = Number(body?.longitude);
@@ -52,20 +60,33 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "RADIUS_TIDAK_VALID" }, { status: 400 });
   }
 
+  const nama = (body?.nama ?? "Perumahan").toString().slice(0, 80) || "Perumahan";
+  const kelurahan = (body?.kelurahan ?? "").toString().slice(0, 80) || null;
+  const kecamatan = (body?.kecamatan ?? "").toString().slice(0, 80) || null;
+
   const l = await prisma.lokasiAbsensi.upsert({
     where: { id: "perumahan" },
     create: {
       id: "perumahan",
-      nama: (body?.nama ?? "Perumahan").toString().slice(0, 80) || "Perumahan",
+      nama,
+      kelurahan, kecamatan,
       latitude: lat, longitude: lng, radiusMeter: radius,
     },
     update: {
-      nama: (body?.nama ?? "Perumahan").toString().slice(0, 80) || "Perumahan",
+      nama,
+      kelurahan, kecamatan,
       latitude: lat, longitude: lng, radiusMeter: radius,
     },
   });
   return NextResponse.json({
     ok: true,
-    lokasi: { nama: l.nama, latitude: l.latitude, longitude: l.longitude, radiusMeter: l.radiusMeter },
+    lokasi: {
+      nama: l.nama,
+      kelurahan: l.kelurahan,
+      kecamatan: l.kecamatan,
+      latitude: l.latitude,
+      longitude: l.longitude,
+      radiusMeter: l.radiusMeter,
+    },
   });
 }

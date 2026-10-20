@@ -10,6 +10,8 @@ interface Item {
   id: string;
   nama: string;
   keterangan: string | null;
+  kelurahan: string | null;
+  kecamatan: string | null;
   lat: number;
   lng: number;
   akurasi: number | null;
@@ -114,6 +116,11 @@ export default function KondisiRekapPage() {
               <div>
                 <p className="font-bold text-slate-800">{lihat.nama} (Security)</p>
                 <p className="text-sm text-slate-500">{formatTanggalWaktuWita(lihat.createdAt)}</p>
+                {(lihat.kelurahan || lihat.kecamatan) && (
+                  <p className="text-sm font-semibold text-slate-600">
+                    {[lihat.kelurahan && `Kel. ${lihat.kelurahan}`, lihat.kecamatan && `Kec. ${lihat.kecamatan}`].filter(Boolean).join(", ")}
+                  </p>
+                )}
                 <p className="text-xs text-slate-500">
                   {lihat.lat.toFixed(5)}, {lihat.lng.toFixed(5)}
                   {lihat.akurasi != null && ` · akurasi ±${Math.round(lihat.akurasi)} m`}

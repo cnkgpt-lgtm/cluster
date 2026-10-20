@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
         id: f.id,
         nama: f.user.name,
         keterangan: f.keterangan,
+        kelurahan: f.kelurahan,
+        kecamatan: f.kecamatan,
         lat: f.lat,
         lng: f.lng,
         akurasi: f.akurasi,
@@ -108,6 +110,9 @@ export async function POST(req: NextRequest) {
   }
 
   const sekarang = new Date();
+  const kelurahan = lokasi.kelurahan ?? null;
+  const kecamatan = lokasi.kecamatan ?? null;
+  const wilayah = [lokasi.nama, kelurahan, kecamatan].filter(Boolean).join(", ");
   let refFoto: string;
   try {
     const namaBersih = (me.name ?? "security")
@@ -118,7 +123,7 @@ export async function POST(req: NextRequest) {
         "📷 Foto Kondisi Cluster",
         `👤 ${me.name ?? "-"} (Security)`,
         `🕐 ${formatTanggalWaktuWita(sekarang)}`,
-        `📍 ${lokasi.nama} (${lat.toFixed(5)}, ${lng.toFixed(5)})`,
+        `📍 ${wilayah} (${lat.toFixed(5)}, ${lng.toFixed(5)})`,
         ...(keterangan ? [`📝 ${keterangan}`] : []),
       ].join("\n"),
     });
@@ -132,6 +137,7 @@ export async function POST(req: NextRequest) {
       userId: me.id,
       foto: refFoto,
       keterangan,
+      kelurahan, kecamatan,
       lat,
       lng,
       akurasi: Number.isFinite(akurasi) ? akurasi : null,

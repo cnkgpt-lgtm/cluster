@@ -7,7 +7,7 @@ import { Card, Empty, Badge } from "@/components/ui";
 import { formatTanggalWita, formatTanggalWaktuWita } from "@/lib/format";
 import { dalamRadius } from "@/lib/absensi";
 
-interface Lokasi { nama: string; latitude: number; longitude: number; radiusMeter: number }
+interface Lokasi { nama: string; kelurahan: string | null; kecamatan: string | null; latitude: number; longitude: number; radiusMeter: number }
 interface Item { id: string; keterangan: string | null; createdAt: string }
 
 function formatStampel(d: Date): string {
@@ -23,7 +23,7 @@ function formatStampel(d: Date): string {
 // Gambar foto + stempel tanggal/jam/lokasi di bagian bawah gambar.
 function buatFotoStempel(
   video: HTMLVideoElement,
-  lat: number, lng: number, akurasi: number, namaLokasi: string,
+  lat: number, lng: number, akurasi: number, lokasi: Lokasi,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const w = video.videoWidth || 1280;
@@ -31,7 +31,7 @@ function buatFotoStempel(
     const skala = Math.min(1, 1280 / w);
     const W = Math.round(w * skala);
     const H = Math.round(h * skala);
-    const bar = Math.round(H * 0.16);
+    const bar = Math.round(H * 0.2);
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
@@ -43,15 +43,23 @@ function buatFotoStempel(
     ctx.fillStyle = "#ffffff";
     ctx.textBaseline = "middle";
     const pad = Math.round(W * 0.04);
-    const fs1 = Math.max(20, Math.round(W * 0.038));
+    const fs1 = Math.max(20, Math.round(W * 0.036));
     const fs2 = Math.max(16, Math.round(W * 0.03));
+    const wilayah = [
+      lokasi.nama,
+      lokasi.kelurahan ? `Kel. ${lokasi.kelurahan.replace(/^Kel\.\s*/i, "")}` : null,
+      lokasi.kecamatan ? `Kec. ${lokasi.kecamatan.replace(/^Kec\.\s*/i, "")}` : null,
+    ].filter(Boolean).join(" · ");
     ctx.font = `700 ${fs1}px system-ui, sans-serif`;
-    ctx.fillText(formatStampel(new Date()), pad, H - bar + bar * 0.3);
-    ctx.font = `500 ${fs2}px system-ui, sans-serif`;
+    ctx.fillText(formatStampel(new Date()), pad, H - bar + bar * 0.22);
+    ctx.font = `600 ${fs2}px system-ui, sans-serif`;
     ctx.fillStyle = "#d7f5e3";
+    ctx.fillText(wilayah, pad, H - bar + bar * 0.55);
+    ctx.font = `500 ${fs2}px system-ui, sans-serif`;
+    ctx.fillStyle = "#cbd5e1";
     ctx.fillText(
-      `${namaLokasi} · ${lat.toFixed(5)}, ${lng.toFixed(5)} (±${Math.round(akurasi)} m)`,
-      pad, H - bar + bar * 0.72,
+      `${lat.toFixed(5)}, ${lng.toFixed(5)} (±${Math.round(akurasi)} m)`,
+      pad, H - bar + bar * 0.84,
     );
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("blob"))), "image/jpeg", 0.85);
   });
@@ -155,7 +163,7 @@ export default function KondisiPage() {
     const video = videoRef.current;
     if (!video || !pos || !lokasi) return;
     try {
-      const blob = await buatFotoStempel(video, pos.lat, pos.lng, pos.akurasi, lokasi.nama);
+      const blob = await buatFotoStempel(video, pos.lat, pos.lng, pos.akurasi, lokasi);
       setBlobFoto(blob);
       setPratinjau(URL.createObjectURL(blob));
       // Hentikan stream agar hemat baterai saat pratinjau
@@ -215,7 +223,7 @@ export default function KondisiPage() {
         <h1 className="flex items-center gap-2 text-xl font-extrabold text-slate-800">
           <Ikon nama="kamera" className="h-6 w-6" /> Foto Kondisi Cluster
         </h1>
-        <p className="text-sm text-slate-500">Foto suasana terkini — tanggal, jam, dan lokasi otomatis tercetak di foto.</p>
+        <p className="text-sm text-slate-500">Foto suasana terkini — tanggal, jam, kelurahan/kecamatan & lokasi otomatis tercetak di foto.</p>
       </div>
 
       {pesan && (

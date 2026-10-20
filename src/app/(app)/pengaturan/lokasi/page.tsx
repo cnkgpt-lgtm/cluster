@@ -12,6 +12,8 @@ const DEFAULT = { lat: -5.1477, lng: 119.4327 };
 
 export default function LokasiPage() {
   const [nama, setNama] = useState("Perumahan");
+  const [kelurahan, setKelurahan] = useState("");
+  const [kecamatan, setKecamatan] = useState("");
   const [lat, setLat] = useState(DEFAULT.lat);
   const [lng, setLng] = useState(DEFAULT.lng);
   const [radius, setRadius] = useState(200);
@@ -31,6 +33,8 @@ export default function LokasiPage() {
       .then((d) => {
         if (d?.lokasi) {
           setNama(d.lokasi.nama);
+          setKelurahan(d.lokasi.kelurahan ?? "");
+          setKecamatan(d.lokasi.kecamatan ?? "");
           setLat(d.lokasi.latitude);
           setLng(d.lokasi.longitude);
           setRadius(d.lokasi.radiusMeter);
@@ -43,16 +47,35 @@ export default function LokasiPage() {
 
   useEffect(() => { muat(); }, [muat]);
 
+  // Isi kelurahan & kecamatan otomatis dari koordinat (reverse geocode OSM).
+  const isiWilayah = useCallback(async (a: number, b: number) => {
+    try {
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${a}&lon=${b}&accept-language=id`,
+      );
+      const d = await r.json().catch(() => null);
+      const ad = (d?.address ?? {}) as Record<string, string>;
+      const kel = ad.village ?? ad.suburb ?? ad.neighbourhood ?? "";
+      const kec = ad.city_district ?? ad.district ?? ad.suburb ?? ad.town ?? "";
+      if (kel) setKelurahan(kel);
+      if (kec && kec !== kel) setKecamatan(kec);
+    } catch {
+      // Boleh dikosongkan — bisa diisi manual.
+    }
+  }, []);
+
   const gunakanLokasiSaya = () => {
     if (!("geolocation" in navigator)) {
       setPesan({ ok: false, teks: "Perangkat tidak mendukung GPS." });
       return;
     }
+    setPesan({ ok: true, teks: "Mengambil posisi GPS Anda…" });
     navigator.geolocation.getCurrentPosition(
       (p) => {
         setLat(p.coords.latitude);
         setLng(p.coords.longitude);
-        setPesan({ ok: true, teks: "Titik diambil dari posisi Anda. Geser bila perlu, lalu simpan." });
+        void isiWilayah(p.coords.latitude, p.coords.longitude);
+        setPesan({ ok: true, teks: "Titik diambil dari posisi Anda & wilayah terisi otomatis. Periksa, lalu simpan." });
       },
       () => setPesan({ ok: false, teks: "Izin lokasi ditolak." }),
       { enableHighAccuracy: true, timeout: 15000 },
@@ -66,7 +89,7 @@ export default function LokasiPage() {
       const r = await fetch("/api/lokasi-absensi", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nama, latitude: lat, longitude: lng, radiusMeter: radius }),
+        body: JSON.stringify({ nama, kelurahan, kecamatan, latitude: lat, longitude: lng, radiusMeter: radius }),
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) {
@@ -112,11 +135,21 @@ export default function LokasiPage() {
           <p className="text-sm text-slate-500">Memuat peta…</p>
         ) : (
           <div className="space-y-4">
+            <button
+              onClick={gunakanLokasiSaya}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-extrabold text-sky-700 transition hover:bg-sky-100 active:scale-95"
+            >
+              <Ikon nama="lokasi" className="h-5 w-5" /> Gunakan Lokasi Saya (GPS)
+            </button>
+            <p className="text-xs text-slate-500">
+              Berdiri di area perumahan lalu ketuk tombol di atas — titik, kelurahan & kecamatan terisi otomatis tanpa mencari di peta.
+            </p>
+
             <Peta
               lat={lat}
               lng={lng}
               radius={radius}
-              onPilih={(a, b) => { setLat(a); setLng(b); }}
+              onPilih={(a, b) => { setLat(a); setLng(b); void isiWilayah(a, b); }}
             />
             <p className="text-xs text-slate-500">
               Ketuk peta atau seret pin untuk memindahkan titik. Lingkaran hijau = area absen.
@@ -132,6 +165,32 @@ export default function LokasiPage() {
                 maxLength={80}
               />
             </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-sm font-bold text-slate-700">Kelurahan</label>
+                <input
+                  value={kelurahan}
+                  onChange={(e) => setKelurahan(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="Kel. Tamalanrea"
+                  maxLength={80}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-bold text-slate-700">Kecamatan</label>
+                <input
+                  value={kecamatan}
+                  onChange={(e) => setKecamatan(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="Kec. Tamalanrea"
+                  maxLength={80}
+                />
+              </div>
+            </div>
+            <p className="text-xs text-slate-500">
+              Kelurahan & kecamatan tampil di stempel foto kondisi security.
+            </p>
 
             <div>
               <div className="flex items-center justify-between">
@@ -154,7 +213,7 @@ export default function LokasiPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2">
               <div className="rounded-xl bg-slate-50 px-3 py-2">
                 <p className="text-xs text-slate-500">Latitude</p>
                 <p className="font-mono text-sm font-bold">{lat.toFixed(6)}</p>
@@ -163,12 +222,6 @@ export default function LokasiPage() {
                 <p className="text-xs text-slate-500">Longitude</p>
                 <p className="font-mono text-sm font-bold">{lng.toFixed(6)}</p>
               </div>
-              <button
-                onClick={gunakanLokasiSaya}
-                className="rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-700 transition hover:bg-sky-100"
-              >
-                <span className="inline-flex items-center gap-2"><Ikon nama="lokasi" className="h-4 w-4" /> Lokasi saya</span>
-              </button>
             </div>
 
             <button

@@ -257,6 +257,8 @@ model Absensi {
 model LokasiAbsensi {
   id          String   @id @default("perumahan")
   nama        String   @default("Perumahan")
+  kelurahan   String?
+  kecamatan   String?
   latitude    Float
   longitude   Float
   radiusMeter Int      @default(200)
@@ -273,6 +275,8 @@ model FotoKondisi {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   foto       String   // ref penyimpanan (Telegram / fallback)
   keterangan String?  // catatan singkat security, mis. "Gerbang utama aman"
+  kelurahan  String?  // snapshot dari pengaturan lokasi saat foto diambil
+  kecamatan  String?
   lat        Float
   lng        Float
   akurasi    Float?   // akurasi GPS (meter) saat foto diambil
